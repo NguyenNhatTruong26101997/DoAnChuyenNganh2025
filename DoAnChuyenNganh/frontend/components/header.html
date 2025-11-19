@@ -1,0 +1,148 @@
+<!-- Header Component - Laptop World -->
+<header class="header-main sticky-top">
+    <!-- Top Bar -->
+    <div class="top-bar bg-dark text-white py-2">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="contact-info d-flex gap-3">
+                        <span><i class="bi bi-telephone-fill"></i> 0123-456-789</span>
+                        <span><i class="bi bi-envelope-fill"></i> contact@laptopworld.com</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="top-links d-flex justify-content-end gap-3">
+                        <a href="/frontend/pages/about.html" class="text-white text-decoration-none"><i class="bi bi-info-circle"></i> Về chúng tôi</a>
+                        <a href="/frontend/pages/support.html" class="text-white text-decoration-none"><i class="bi bi-headset"></i> Hỗ trợ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <div class="main-header bg-white shadow-sm py-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Logo -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <a href="/frontend/index.html" class="logo d-flex align-items-center text-decoration-none">
+                        <i class="bi bi-laptop text-primary fs-2 me-2"></i>
+                        <div>
+                            <h1 class="mb-0 fs-4 text-primary fw-bold">Laptop World</h1>
+                            <small class="text-muted">Technology Store</small>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="col-lg-5 col-md-5 d-none d-md-block">
+                    <div class="search-box">
+                        <form class="d-flex position-relative">
+                            <input type="text" class="form-control pe-5" placeholder="Tìm kiếm laptop, thương hiệu...">
+                            <button type="submit" class="btn btn-primary position-absolute end-0 top-0 bottom-0">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- User Actions -->
+                <div class="col-lg-5 col-md-4 col-6">
+                    <div class="header-actions d-flex justify-content-end align-items-center gap-3">
+                        <!-- AI Assistant -->
+                        <a href="#" class="action-item text-decoration-none d-none d-lg-block" data-bs-toggle="tooltip" title="AI Hỗ trợ">
+                            <i class="bi bi-robot fs-4 text-primary"></i>
+                            <span class="d-block small text-muted">AI Tư vấn</span>
+                        </a>
+
+                        <!-- User Account -->
+                        <div class="dropdown">
+                            <a href="#" class="action-item text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle fs-4 text-primary"></i>
+                                <span class="d-none d-lg-block small text-muted">Tài khoản</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/frontend/pages/login.html"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</a></li>
+                                <li><a class="dropdown-item" href="/frontend/pages/register.html"><i class="bi bi-person-plus"></i> Đăng ký</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/frontend/pages/profile.html"><i class="bi bi-person"></i> Hồ sơ</a></li>
+                                <li><a class="dropdown-item" href="/frontend/pages/orders.html"><i class="bi bi-bag-check"></i> Đơn hàng</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Shopping Cart -->
+                        <a href="/frontend/pages/cart.html" class="action-item text-decoration-none position-relative">
+                            <i class="bi bi-cart3 fs-4 text-primary"></i>
+                            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">3</span>
+                            <span class="d-none d-lg-block small text-muted">Giỏ hàng</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Search -->
+            <div class="row d-md-none mt-3">
+                <div class="col-12">
+                    <form class="d-flex position-relative">
+                        <input type="text" class="form-control pe-5" placeholder="Tìm kiếm...">
+                        <button type="submit" class="btn btn-primary position-absolute end-0 top-0 bottom-0">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/frontend/index.html"><i class="bi bi-house-door"></i> Trang chủ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-laptop"></i> Thương hiệu
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?brand=dell">Dell</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?brand=hp">HP</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?brand=lenovo">Lenovo</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?brand=asus">Asus</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?brand=acer">Acer</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?brand=msi">MSI</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?brand=apple">Apple MacBook</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-tags"></i> Danh mục
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?category=gaming">Laptop Gaming</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?category=office">Văn phòng</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?category=graphics">Đồ họa</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?category=student">Sinh viên</a></li>
+                            <li><a class="dropdown-item" href="/frontend/pages/products.html?category=business">Doanh nhân</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/pages/products.html"><i class="bi bi-grid"></i> Sản phẩm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/pages/deals.html"><i class="bi bi-fire"></i> Khuyến mãi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/frontend/pages/contact.html"><i class="bi bi-telephone"></i> Liên hệ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

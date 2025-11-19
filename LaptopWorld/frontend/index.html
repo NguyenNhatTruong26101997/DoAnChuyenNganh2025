@@ -25,18 +25,15 @@
       <h1>Chào mừng đến với Laptop World</h1>
       <p>Website cửa hàng laptop — demo scaffold with Bootstrap, Node.js backend.</p>
       <div class="row">
-        <div class="col-md-8">
-          <h3>Sản phẩm nổi bật</h3>
-          <div id="featured" class="row"></div>
-        </div>
-        <div class="col-md-4">
-          <h5>Tìm kiếm nhanh</h5>
-          <form id="quick-search">
-            <div class="input-group mb-3">
-              <input class="form-control" id="q" placeholder="Tên laptop...">
-              <button class="btn btn-primary">Tìm</button>
-            </div>
+        <div class="col-12 mb-4">
+          <form id="quick-search" class="d-flex">
+            <input class="form-control me-2" id="q" placeholder="Tìm tên laptop...">
+            <button class="btn btn-primary">Tìm</button>
           </form>
+        </div>
+        <div class="col-12">
+          <h3>Sản phẩm nổi bật</h3>
+          <div id="featured" class="row row-cols-1 row-cols-md-3 g-3"></div>
         </div>
       </div>
     </main>

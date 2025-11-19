@@ -52,14 +52,9 @@ f:\\DoAnChuyenNganh\\LaptopWorld
 ├── backend/              
 ├── db/                   
 ├── frontend/             
-├── public/              
+├── backup/               
 ├── README.md
-├── server.js             
-└── src/                  
-	├── ai.js
-	├── db.js
-	├── controllers/
-	└── routes/
+└── package-lock.json
 ```
 
 Chi tiết cây thư mục (nội dung hiện có trên đĩa):
@@ -70,24 +65,24 @@ f:\\DoAnChuyenNganh\\LaptopWorld
 ├── .gitignore
 ├── app.js
 ├── package.json
-├── backend
+├── backend/
 │   ├── ai.js
 │   ├── db.js
-│   ├── controllers
+│   ├── controllers/
 │   │   └── authController.js
-│   └── routes
+│   └── routes/
 │       ├── api.js
 │       └── auth.js
-├── db
+├── db/
 │   ├── ChuyenNganh.sql
 │   └── IMPORT_DB.md
-├── frontend
+├── frontend/
 │   ├── index.html
-│   ├── css
+│   ├── css/
 │   │   └── styles.css
-│   ├── js
+│   ├── js/
 │   │   └── main.js
-│   └── pages
+│   └── pages/
 │       ├── admin.html
 │       ├── contact.html
 │       ├── invoice.html
@@ -95,30 +90,11 @@ f:\\DoAnChuyenNganh\\LaptopWorld
 │       ├── order.html
 │       ├── register.html
 │       └── search.html
-├── public
-│   ├── index.html
-│   ├── css
-│   │   └── styles.css
-│   ├── js
-│   │   └── main.js
-│   └── pages
-│       ├── admin.html
-│       ├── contact.html
-│       ├── invoice.html
-│       ├── login.html
-│       ├── order.html
-│       ├── register.html
-│       └── search.html
+├── backup/                (contains previous `src/` and `public/` copies)
+│   ├── README.md
+│   ├── src/
+│   └── public/
 ├── README.md
-├── server.js
-└── src
-	├── ai.js
-	├── db.js
-	├── controllers
-	│   └── authController.js
-	└── routes
-		├── api.js
-		└── auth.js
 ```
 
 Ghi chú:

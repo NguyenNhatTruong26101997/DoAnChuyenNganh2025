@@ -33,21 +33,22 @@
       </div>
     </div>
 
-    <script>
-      document.getElementById('register-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, email, password }) });
-        const data = await r.json();
-        if (r.ok) {
-          alert('Đăng ký thành công. Vui lòng đăng nhập.');
-          location.href = '/pages/login.html';
-        } else {
-          alert(data.error || 'Lỗi đăng ký');
-        }
-      });
-    </script>
-  </body>
-</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html>  </body>    </script>      });        }          alert(data.error || 'Lỗi đăng ký');        } else {          location.href = '/pages/login.html';          alert('Đăng ký thành công. Vui lòng đăng nhập.');        if (r.ok) {        const data = await r.json();        const r = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, email, password }) });        const password = document.getElementById('password').value;        const email = document.getElementById('email').value;        const name = document.getElementById('name').value;        e.preventDefault();      document.getElementById('register-form').addEventListener('submit', async (e) => {    <script>

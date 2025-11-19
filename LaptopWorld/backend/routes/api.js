@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-const { askAI } = require('../ai');
 
 // Search products (uses `SanPham` table from ChuyenNganh.sql)
 router.get('/search', async (req, res) => {
@@ -98,15 +97,15 @@ router.get('/admin/users', async (req, res) => {
   }
 });
 
-// AI helper endpoint (demo)
-router.post('/ai', async (req, res) => {
+// Health check
+router.get('/health', async (req, res) => {
   try {
-    const { prompt } = req.body;
-    const reply = await askAI(prompt || '');
-    res.json({ reply });
+    // quick DB check
+    await db.query('SELECT 1');
+    res.json({ ok: true, uptime: process.uptime(), db: 'connected' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message || 'AI call failed' });
+    console.error('Health check DB error', err);
+    res.status(500).json({ ok: false, error: err.message || 'db error' });
   }
 });
 

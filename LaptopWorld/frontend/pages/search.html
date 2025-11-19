@@ -13,22 +13,34 @@
         <div class="input-group">
           <input id="q" class="form-control" placeholder="Tìm tên sản phẩm">
           <button class="btn btn-primary">Tìm</button>
-        </div>
-      </form>
-      <div id="results" class="row"></div>
-    </div>
-
-    <script>
-      document.getElementById('search-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const q = document.getElementById('q').value;
-        const r = await fetch('/api/search?q=' + encodeURIComponent(q));
-        const data = await r.json();
-        const out = document.getElementById('results');
-        out.innerHTML = '';
-        (data.results || []).forEach(p => {
-          const div = document.createElement('div');
-          div.className = 'col-md-4';
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(location.search);
+            const q0 = params.get('q') || '';
+            const input = document.getElementById('q');
+            if (input) input.value = q0;
+            document.getElementById('search-form').addEventListener('submit', (e) => {
+              e.preventDefault();
+              const q = document.getElementById('q').value;
+              location.search = '?q=' + encodeURIComponent(q);
+            });
+            // render results
+            (async () => {
+              const q = document.getElementById('q').value || '';
+              const r = await fetch('/api/search?q=' + encodeURIComponent(q));
+              const data = await r.json().catch(()=>({}));
+              const out = document.getElementById('results');
+              out.innerHTML = '';
+              (data.results || []).forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'col-md-4';
+                div.innerHTML = `<div class="card p-2 mb-3"><h5>${p.TenSanPham}</h5><p>${formatCurrency(p.GiaSanPham) || ''}</p><a href="/pages/product.html?id=${p.IdSanPham}" class="btn btn-sm btn-outline-primary mt-2">Xem</a><button class="btn btn-sm btn-success mt-2" data-add='${JSON.stringify({ id: p.IdSanPham, name: p.TenSanPham, price: p.GiaSanPham })}'>Thêm vào giỏ</button></div>`;
+                out.appendChild(div);
+              });
+              out.querySelectorAll('button[data-add]').forEach(btn=>btn.addEventListener('click', ()=>{const info=JSON.parse(btn.getAttribute('data-add')); addToCart(info.id,info.name,info.price); alert('Đã thêm vào giỏ');}));
+            })();
+          });
+        </script>
           div.innerHTML = `<div class="card p-2 mb-3"><h5>${p.TenSanPham}</h5><p>${p.GiaSanPham || ''}</p></div>`;
           out.appendChild(div);
         });
