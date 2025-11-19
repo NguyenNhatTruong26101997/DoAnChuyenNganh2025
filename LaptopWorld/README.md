@@ -47,15 +47,15 @@ Hệ thống tích hợp **AI hỗ trợ người dùng** để gợi ý sản p
 f:\\DoAnChuyenNganh\\LaptopWorld
 ├── .env.example
 ├── .gitignore
-├── app.js                # entrypoint (mới)
+├── app.js                
 ├── package.json
-├── backend/              # server code (controllers, routes, db helpers)
-├── db/                   # SQL dumps (ví dụ: ChuyenNganh.sql)
-├── frontend/             # static site (HTML/CSS/JS + Bootstrap)
-├── public/               # bản copy ban đầu của frontend (vẫn còn)
+├── backend/              
+├── db/                   
+├── frontend/             
+├── public/              
 ├── README.md
-├── server.js             # obsolete/deprecated placeholder (vẫn còn file)
-└── src/                  # bản copy ban đầu của backend (vẫn còn)
+├── server.js             
+└── src/                  
 	├── ai.js
 	├── db.js
 	├── controllers/
