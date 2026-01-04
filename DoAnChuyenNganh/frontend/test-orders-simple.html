@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Orders</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Test Admin Orders</h1>
+    <button onclick="testOrders()">Load Orders</button>
+    <button onclick="updateStatus()">Update Status to "Da giao"</button>
+    <pre id="result">Click button to test...</pre>
+
+    <script src="js/api.js"></script>
+    <script>
+        async function testOrders() {
+            const result = document.getElementById('result');
+            result.textContent = 'Loading...';
+            
+            try {
+                const response = await api.get('/orders/admin/all');
+                result.textContent = JSON.stringify(response, null, 2);
+                
+                if (response.success && response.data) {
+                    console.log('Found', response.data.length, 'orders');
+                }
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function updateStatus() {
+            const orderId = prompt('Nhập ID đơn hàng (số):');
+            if (!orderId) return;
+            
+            const result = document.getElementById('result');
+            result.textContent = 'Updating...';
+            
+            try {
+                const response = await api.put(`/orders/${orderId}/status`, {
+                    trangThaiDonHang: 'Da giao'
+                });
+                result.textContent = JSON.stringify(response, null, 2);
+                
+                if (response.success) {
+                    alert('Cập nhật thành công!');
+                }
+            } catch (error) {
+                result.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

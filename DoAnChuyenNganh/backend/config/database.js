@@ -1,29 +1,29 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-// Tạo connection pool để quản lý kết nối hiệu quả
+// Create MySQL connection pool
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'LaptopWorld',
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0
 });
 
-// Sử dụng promise wrapper để dễ dàng làm việc với async/await
-const promisePool = pool.promise();
-
-// Kiểm tra kết nối
+// Test database connection
 pool.getConnection((err, connection) => {
-  if (err) {
-    console.error('❌ Lỗi kết nối database:', err.message);
-    return;
-  }
-  console.log('✅ Kết nối database thành công!');
-  connection.release();
+    if (err) {
+        console.error('Database connection failed:', err.message);
+        return;
+    }
+    console.log('Database connected successfully!');
+    connection.release();
 });
 
-module.exports = promisePool;
+// Export pool with promise wrapper
+module.exports = pool.promise();

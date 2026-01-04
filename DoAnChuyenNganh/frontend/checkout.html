@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - Laptop World</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="header-container"></div>
+
+    <div class="bg-gradient text-white py-4">
+        <div class="container">
+            <h1><i class="fas fa-credit-card"></i> Thanh Toán</h1>
+        </div>
+    </div>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <form id="checkoutForm" onsubmit="handleCheckout(event)">
+                        <!-- Customer Info (Read-only) -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4"><i class="fas fa-user"></i> Thông tin khách hàng</h5>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> Thông tin này lấy từ tài khoản của bạn và không thể chỉnh sửa
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Họ và tên</label>
+                                        <input type="text" class="form-control" id="customerName" readonly>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Số điện thoại</label>
+                                        <input type="tel" class="form-control" id="customerPhone" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="customerEmail" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Info (Editable) -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3"><i class="fas fa-shipping-fast"></i> Thông tin giao hàng</h5>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="sameAsCustomer" onchange="toggleShippingInfo()">
+                                    <label class="form-check-label" for="sameAsCustomer">
+                                        Giao hàng đến địa chỉ khác
+                                    </label>
+                                </div>
+
+                                <div id="shippingInfoSection" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Họ tên người nhận *</label>
+                                            <input type="text" class="form-control" id="receiverName" placeholder="Nhập họ tên người nhận">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Số điện thoại người nhận *</label>
+                                            <input type="tel" class="form-control" id="receiverPhone" placeholder="Nhập số điện thoại">
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Email người nhận</label>
+                                        <input type="email" class="form-control" id="receiverEmail" placeholder="Nhập email (tùy chọn)">
+                                    </div>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label">Địa chỉ giao hàng đầy đủ *</label>
+                                    <textarea class="form-control" id="address" required rows="3" 
+                                        placeholder="Nhập địa chỉ đầy đủ: Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+                                    <div class="form-text">Ví dụ: 123 Nguyễn Văn Linh, Phường Tân Phú, Quận 7, TP. Hồ Chí Minh</div>
+                                </div>
+
+                                <div class="mb-0 mt-3">
+                                    <label class="form-label">Ghi chú</label>
+                                    <textarea class="form-control" id="note" rows="2"
+                                        placeholder="Ghi chú về đơn hàng, thời gian giao hàng mong muốn... (tùy chọn)"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4"><i class="fas fa-money-bill-wave"></i> Phương thức thanh
+                                    toán</h5>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="payment" id="cod" value="cod"
+                                        checked>
+                                    <label class="form-check-label" for="cod">
+                                        <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                        <div class="text-muted small">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="payment" id="bank" value="bank">
+                                    <label class="form-check-label" for="bank">
+                                        <strong>Chuyển khoản ngân hàng</strong>
+                                        <div class="text-muted small">Chuyển khoản trực tiếp đến tài khoản ngân hàng
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="payment" id="card" value="card">
+                                    <label class="form-check-label" for="card">
+                                        <strong>Thẻ tín dụng/Thẻ ghi nợ</strong>
+                                        <div class="text-muted small">Thanh toán bằng thẻ Visa, MasterCard, JCB</div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle"></i> Đặt hàng
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="card sticky-top" style="top: 100px;">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Đơn hàng của bạn</h5>
+
+                            <div id="orderItems" class="mb-3">
+                                <!-- Order items -->
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tạm tính:</span>
+                                <span id="subtotal">0đ</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Phí vận chuyển:</span>
+                                <span>Miễn phí</span>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Tổng cộng:</strong>
+                                <strong class="text-primary" style="font-size: 1.25rem;" id="total">0đ</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/cart-api.js"></script>
+    <script src="js/chatbot.js"></script>
+
+    <script>
+        let cartData = null;
+        let userData = null;
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Check if user is logged in
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showNotification('Vui lòng đăng nhập để thanh toán', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+
+            // Load user data
+            userData = JSON.parse(localStorage.getItem('user'));
+
+            // Load cart
+            cartData = await getCartAPI();
+            
+            if (!cartData || !cartData.items || cartData.items.length === 0) {
+                showNotification('Giỏ hàng trống', 'error');
+                setTimeout(() => {
+                    window.location.href = 'cart.html';
+                }, 1500);
+                return;
+            }
+
+            loadOrderSummary();
+            prefillUserInfo();
+        });
+
+        function prefillUserInfo() {
+            if (userData) {
+                document.getElementById('customerName').value = userData.hoTen || userData.HoTen || '';
+                document.getElementById('customerPhone').value = userData.soDienThoai || userData.SoDienThoai || '';
+                document.getElementById('customerEmail').value = userData.email || userData.Email || '';
+            }
+        }
+
+        function toggleShippingInfo() {
+            const checkbox = document.getElementById('sameAsCustomer');
+            const section = document.getElementById('shippingInfoSection');
+            const receiverName = document.getElementById('receiverName');
+            const receiverPhone = document.getElementById('receiverPhone');
+            
+            if (checkbox.checked) {
+                section.style.display = 'block';
+                receiverName.required = true;
+                receiverPhone.required = true;
+            } else {
+                section.style.display = 'none';
+                receiverName.required = false;
+                receiverPhone.required = false;
+                receiverName.value = '';
+                receiverPhone.value = '';
+                document.getElementById('receiverEmail').value = '';
+            }
+        }
+
+        function loadOrderSummary() {
+            const orderItems = document.getElementById('orderItems');
+
+            orderItems.innerHTML = '';
+            cartData.items.forEach(item => {
+                orderItems.innerHTML += `
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>${item.TenSanPham} x${item.SoLuongChiTietGioHang}</span>
+                        <span>${formatCurrency(item.GiaSanPham * item.SoLuongChiTietGioHang)}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('subtotal').textContent = formatCurrency(cartData.total);
+            document.getElementById('total').textContent = formatCurrency(cartData.total);
+        }
+
+        async function handleCheckout(event) {
+            event.preventDefault();
+
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+            try {
+                // Get form data
+                const address = document.getElementById('address').value.trim();
+                const note = document.getElementById('note').value.trim();
+                const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
+                // Validate address
+                if (!address || address.length < 20) {
+                    showNotification('Vui lòng nhập địa chỉ đầy đủ (tối thiểu 20 ký tự)', 'error');
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Đặt hàng';
+                    return;
+                }
+
+                // Check if shipping to different address
+                const sameAsCustomer = document.getElementById('sameAsCustomer').checked;
+                let receiverName, receiverPhone, receiverEmail;
+
+                if (sameAsCustomer) {
+                    // Use different shipping info
+                    receiverName = document.getElementById('receiverName').value.trim();
+                    receiverPhone = document.getElementById('receiverPhone').value.trim();
+                    receiverEmail = document.getElementById('receiverEmail').value.trim();
+
+                    if (!receiverName || !receiverPhone) {
+                        showNotification('Vui lòng nhập đầy đủ thông tin người nhận', 'error');
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Đặt hàng';
+                        return;
+                    }
+                } else {
+                    // Use customer info
+                    receiverName = document.getElementById('customerName').value.trim();
+                    receiverPhone = document.getElementById('customerPhone').value.trim();
+                    receiverEmail = document.getElementById('customerEmail').value.trim();
+                }
+
+                // Create order
+                const result = await api.post('/orders', {
+                    hoTenNguoiNhan: receiverName,
+                    soDienThoaiNguoiNhan: receiverPhone,
+                    emailNguoiNhan: receiverEmail,
+                    diaChiGiao: address,
+                    ghiChu: note,
+                    phuongThucThanhToan: paymentMethod === 'cod' ? 'Tien mat' : 
+                                        paymentMethod === 'bank' ? 'Chuyen khoan' : 'The tin dung'
+                });
+
+                if (result.success) {
+                    showNotification('Đặt hàng thành công!', 'success');
+
+                    // Update cart count
+                    if (typeof window.updateCartCount === 'function') {
+                        await window.updateCartCount();
+                    }
+
+                    setTimeout(() => {
+                        alert(`Cảm ơn bạn đã đặt hàng!\n\nMã đơn hàng: ${result.data.maDonHang}\n\nChúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để xác nhận đơn hàng.`);
+                        window.location.href = 'profile.html';
+                    }, 1000);
+                } else {
+                    showNotification(result.message || 'Đặt hàng thất bại', 'error');
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Đặt hàng';
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showNotification('Lỗi kết nối đến server', 'error');
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Đặt hàng';
+            }
+        }
+    </script>
+
+  <!-- Scroll to Top Button -->
+  <script src="js/components/scroll-to-top.js"></script>
+</body>
+
+</html>

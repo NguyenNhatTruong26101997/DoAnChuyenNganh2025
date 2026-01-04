@@ -1,367 +1,384 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Laptop World - Cửa hàng laptop uy tín, giá tốt nhất Việt Nam">
-    <meta name="keywords" content="laptop, máy tính xách tay, laptop gaming, laptop văn phòng">
-    <title>Laptop World - Cửa hàng laptop uy tín hàng đầu Việt Nam</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Laptop World - Cửa hàng laptop chính hãng, giá tốt nhất. Chuyên Dell, HP, Asus, Lenovo, MSI, Acer.">
+  <meta name="keywords" content="laptop, laptop gaming, laptop văn phòng, laptop giá rẻ, Dell, HP, Asus">
+  <title>Laptop World - Cửa hàng laptop uy tín số 1 Việt Nam</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-    <!-- Include Header -->
-    <div id="header-placeholder"></div>
+  <!-- Header Container -->
+  <div id="header-container"></div>
 
-    <!-- Hero Slider Section -->
-    <section class="hero-slider">
-        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-            </div>
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <div class="hero-slide bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 500px;">
-                        <div class="container h-100">
-                            <div class="row h-100 align-items-center">
-                                <div class="col-lg-6 text-white">
-                                    <h1 class="display-3 fw-bold mb-4">Laptop Gaming Mới Nhất</h1>
-                                    <p class="lead mb-4">Hiệu năng vượt trội, chinh phục mọi tựa game. Giảm giá lên đến 30%</p>
-                                    <a href="pages/products.html?category=gaming" class="btn btn-light btn-lg px-5">Khám phá ngay</a>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <img src="https://via.placeholder.com/500x400?text=Gaming+Laptop" alt="Gaming Laptop" class="img-fluid">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="hero-slide bg-gradient" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); height: 500px;">
-                        <div class="container h-100">
-                            <div class="row h-100 align-items-center">
-                                <div class="col-lg-6 text-white">
-                                    <h1 class="display-3 fw-bold mb-4">MacBook Pro M3</h1>
-                                    <p class="lead mb-4">Sức mạnh đỉnh cao cho chuyên gia sáng tạo</p>
-                                    <a href="pages/products.html?brand=apple" class="btn btn-light btn-lg px-5">Xem chi tiết</a>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <img src="https://via.placeholder.com/500x400?text=MacBook+Pro" alt="MacBook Pro" class="img-fluid">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="carousel-item">
-                    <div class="hero-slide bg-gradient" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); height: 500px;">
-                        <div class="container h-100">
-                            <div class="row h-100 align-items-center">
-                                <div class="col-lg-6 text-white">
-                                    <h1 class="display-3 fw-bold mb-4">AI Tư Vấn Thông Minh</h1>
-                                    <p class="lead mb-4">Để AI giúp bạn chọn laptop phù hợp nhất</p>
-                                    <button class="btn btn-light btn-lg px-5" data-bs-toggle="modal" data-bs-target="#aiModal">
-                                        <i class="bi bi-robot"></i> Tư vấn ngay
-                                    </button>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <img src="https://via.placeholder.com/500x400?text=AI+Assistant" alt="AI Assistant" class="img-fluid">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-            </button>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="row align-items-center hero-content">
+        <div class="col-lg-6">
+          <h1 class="hero-title">Laptop Chất Lượng<br>Giá Tốt Nhất</h1>
+          <p class="hero-subtitle">Khám phá bộ sưu tập laptop hiện đại từ các thương hiệu hàng đầu thế giới. Cam kết
+            chính hãng 100%, bảo hành tận tâm.</p>
         </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section py-5 bg-light">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-box text-center p-4 bg-white rounded shadow-sm h-100">
-                        <i class="bi bi-truck fs-1 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Miễn phí vận chuyển</h5>
-                        <p class="text-muted mb-0">Cho đơn hàng trên 5 triệu</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-box text-center p-4 bg-white rounded shadow-sm h-100">
-                        <i class="bi bi-shield-check fs-1 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Bảo hành chính hãng</h5>
-                        <p class="text-muted mb-0">Lên đến 24 tháng</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-box text-center p-4 bg-white rounded shadow-sm h-100">
-                        <i class="bi bi-arrow-repeat fs-1 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Đổi trả dễ dàng</h5>
-                        <p class="text-muted mb-0">Trong vòng 7 ngày</p>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <div class="feature-box text-center p-4 bg-white rounded shadow-sm h-100">
-                        <i class="bi bi-headset fs-1 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Hỗ trợ 24/7</h5>
-                        <p class="text-muted mb-0">Luôn sẵn sàng tư vấn</p>
-                    </div>
-                </div>
-            </div>
+        <div class="col-lg-6 text-center d-none d-lg-block">
+          <div style="width: 400px; height: 300px; margin: 0 auto; position: relative; display: flex; align-items: center; justify-content: center;">
+            <!-- Globe emoji behind -->
+            <div style="position: absolute; font-size: 180px; animation: floatGlobe 3s ease-in-out infinite; filter: drop-shadow(0 10px 40px rgba(0,100,255,0.5));">🌍</div>
+            <!-- Laptop in front -->
+            <i class="fas fa-laptop" style="position: relative; z-index: 2; font-size: 90px; color: white; filter: drop-shadow(0 8px 25px rgba(0,0,0,0.4)); margin-top: 30px;"></i>
+          </div>
         </div>
-    </section>
-
-    <!-- Categories Section -->
-    <section class="categories-section py-5">
-        <div class="container">
-            <div class="section-header text-center mb-5">
-                <h2 class="fw-bold">Danh mục sản phẩm</h2>
-                <p class="text-muted">Chọn loại laptop phù hợp với nhu cầu của bạn</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="pages/products.html?category=gaming" class="text-decoration-none">
-                        <div class="category-card text-center p-4 rounded shadow-sm bg-white h-100 hover-lift">
-                            <div class="category-icon mb-3">
-                                <i class="bi bi-controller fs-1 text-danger"></i>
-                            </div>
-                            <h5 class="fw-bold">Laptop Gaming</h5>
-                            <p class="text-muted small mb-0">Hiệu năng cao</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="pages/products.html?category=office" class="text-decoration-none">
-                        <div class="category-card text-center p-4 rounded shadow-sm bg-white h-100 hover-lift">
-                            <div class="category-icon mb-3">
-                                <i class="bi bi-briefcase fs-1 text-primary"></i>
-                            </div>
-                            <h5 class="fw-bold">Văn phòng</h5>
-                            <p class="text-muted small mb-0">Làm việc hiệu quả</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="pages/products.html?category=graphics" class="text-decoration-none">
-                        <div class="category-card text-center p-4 rounded shadow-sm bg-white h-100 hover-lift">
-                            <div class="category-icon mb-3">
-                                <i class="bi bi-palette fs-1 text-success"></i>
-                            </div>
-                            <h5 class="fw-bold">Đồ họa</h5>
-                            <p class="text-muted small mb-0">Sáng tạo nội dung</p>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="pages/products.html?category=student" class="text-decoration-none">
-                        <div class="category-card text-center p-4 rounded shadow-sm bg-white h-100 hover-lift">
-                            <div class="category-icon mb-3">
-                                <i class="bi bi-book fs-1 text-warning"></i>
-                            </div>
-                            <h5 class="fw-bold">Sinh viên</h5>
-                            <p class="text-muted small mb-0">Giá phải chăng</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Flash Sale Section -->
-    <section class="flash-sale-section py-5 bg-danger text-white">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6 mb-3 mb-md-0">
-                    <h2 class="fw-bold mb-2">
-                        <i class="bi bi-lightning-charge-fill"></i> Flash Sale
-                    </h2>
-                    <p class="mb-0">Giảm giá sốc - Số lượng có hạn</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="countdown d-inline-flex gap-3">
-                        <div class="countdown-item text-center">
-                            <div class="bg-white text-danger rounded p-3 fw-bold fs-4">12</div>
-                            <small>Giờ</small>
-                        </div>
-                        <div class="countdown-item text-center">
-                            <div class="bg-white text-danger rounded p-3 fw-bold fs-4">34</div>
-                            <small>Phút</small>
-                        </div>
-                        <div class="countdown-item text-center">
-                            <div class="bg-white text-danger rounded p-3 fw-bold fs-4">56</div>
-                            <small>Giây</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured Products Section -->
-    <section class="featured-products-section py-5">
-        <div class="container">
-            <div class="section-header text-center mb-5">
-                <h2 class="fw-bold">Sản phẩm nổi bật</h2>
-                <p class="text-muted">Các mẫu laptop được yêu thích nhất</p>
-            </div>
-            <div class="row g-4" id="featured-products">
-                <!-- Product Cards will be dynamically loaded or use component -->
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-1"></div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-2"></div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-3"></div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-4"></div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-5"></div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-6"></div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-7"></div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div id="product-card-8"></div>
-                </div>
-            </div>
-            <div class="text-center mt-5">
-                <a href="pages/products.html" class="btn btn-outline-primary btn-lg px-5">
-                    Xem tất cả sản phẩm <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Brands Section -->
-    <section class="brands-section py-5 bg-light">
-        <div class="container">
-            <div class="section-header text-center mb-5">
-                <h2 class="fw-bold">Thương hiệu nổi tiếng</h2>
-                <p class="text-muted">Đối tác chính thức của các hãng lớn</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                    <div class="brand-card text-center p-4 bg-white rounded shadow-sm hover-lift">
-                        <img src="https://via.placeholder.com/150x80?text=Dell" alt="Dell" class="img-fluid">
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                    <div class="brand-card text-center p-4 bg-white rounded shadow-sm hover-lift">
-                        <img src="https://via.placeholder.com/150x80?text=HP" alt="HP" class="img-fluid">
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                    <div class="brand-card text-center p-4 bg-white rounded shadow-sm hover-lift">
-                        <img src="https://via.placeholder.com/150x80?text=Lenovo" alt="Lenovo" class="img-fluid">
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                    <div class="brand-card text-center p-4 bg-white rounded shadow-sm hover-lift">
-                        <img src="https://via.placeholder.com/150x80?text=Asus" alt="Asus" class="img-fluid">
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                    <div class="brand-card text-center p-4 bg-white rounded shadow-sm hover-lift">
-                        <img src="https://via.placeholder.com/150x80?text=Acer" alt="Acer" class="img-fluid">
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                    <div class="brand-card text-center p-4 bg-white rounded shadow-sm hover-lift">
-                        <img src="https://via.placeholder.com/150x80?text=MSI" alt="MSI" class="img-fluid">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Newsletter Section -->
-    <section class="newsletter-section py-5 bg-primary text-white">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 mb-4 mb-lg-0">
-                    <h3 class="fw-bold mb-2">
-                        <i class="bi bi-envelope-fill"></i> Đăng ký nhận tin
-                    </h3>
-                    <p class="mb-0">Nhận thông tin khuyến mãi và sản phẩm mới nhất</p>
-                </div>
-                <div class="col-lg-6">
-                    <form class="newsletter-form">
-                        <div class="input-group input-group-lg">
-                            <input type="email" class="form-control" placeholder="Nhập email của bạn...">
-                            <button class="btn btn-light text-primary fw-bold" type="submit">
-                                Đăng ký
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Include Footer -->
-    <div id="footer-placeholder"></div>
-
-    <!-- AI Chat Modal -->
-    <div class="modal fade" id="aiModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-robot"></i> AI Tư Vấn Laptop
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="chat-container" style="height: 400px; overflow-y: auto;">
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> Xin chào! Tôi là AI assistant. Hãy cho tôi biết nhu cầu của bạn để tư vấn laptop phù hợp nhất.
-                        </div>
-                    </div>
-                    <div class="chat-input mt-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Nhập câu hỏi của bạn...">
-                            <button class="btn btn-primary" type="button">
-                                <i class="bi bi-send"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </section>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script src="assets/js/main.js"></script>
-    <script>
-        // Load components
-        loadComponent('header-placeholder', 'components/header.html');
-        loadComponent('footer-placeholder', 'components/footer.html');
+  <!-- Flash Sale Section - FPT Shop Style -->
+  <section class="flash-sale-section" id="flashSaleSection" style="display: none;">
+    <div class="container py-4">
+      <!-- Flash Sale Header -->
+      <div class="flash-sale-header d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="flash-sale-logo">
+            <i class="fas fa-bolt"></i>
+            <span>FLASH SALE</span>
+          </div>
+          <div class="flash-sale-countdown d-flex align-items-center gap-1">
+            <span class="countdown-label">Kết thúc trong</span>
+            <div class="countdown-box" id="hours">00</div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-box" id="minutes">00</div>
+            <span class="countdown-sep">:</span>
+            <div class="countdown-box" id="seconds">00</div>
+          </div>
+        </div>
+        <a href="#" class="flash-sale-viewall">Xem tất cả <i class="fas fa-chevron-right"></i></a>
+      </div>
+      
+      <!-- Flash Sale Products Slider -->
+      <div class="flash-sale-slider position-relative">
+        <button class="flash-sale-nav flash-sale-prev" onclick="slideFlashSale(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="flash-sale-products" id="flashSaleProductsGrid">
+          <!-- Products loaded by JS -->
+        </div>
+        <button class="flash-sale-nav flash-sale-next" onclick="slideFlashSale(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-5 features-section">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fas fa-shipping-fast fa-3x"></i>
+            </div>
+            <h5>Giao hàng nhanh</h5>
+            <p class="text-muted">Giao hàng toàn quốc 1-3 ngày</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fas fa-shield-alt fa-3x"></i>
+            </div>
+            <h5>Bảo hành uy tín</h5>
+            <p class="text-muted">Bảo hành chính hãng 12-24 tháng</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fas fa-tag fa-3x"></i>
+            </div>
+            <h5>Giá cả cạnh tranh</h5>
+            <p class="text-muted">Cam kết giá tốt nhất thị trường</p>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card text-center p-4">
+            <div class="feature-icon mb-3">
+              <i class="fas fa-headset fa-3x"></i>
+            </div>
+            <h5>Hỗ trợ 24/7</h5>
+            <p class="text-muted">Tư vấn nhiệt tình, chuyên nghiệp</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="py-5 featured-section" id="featured">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="text-gradient">Sản Phẩm Nổi Bật</h2>
+        <p class="text-muted">Các mẫu laptop được yêu thích nhất</p>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="featuredProducts"></div>
+        <!-- Products will be loaded here by JavaScript -->
+      </div>
+
+      <div class="text-center mt-5">
+        <a href="products.html" class="btn btn-primary btn-lg">
+          Xem tất cả sản phẩm <i class="fas fa-arrow-right ms-2"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+
+
+  <!-- Testimonials Section -->
+  <section class="py-5 testimonials-section"></section>
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="text-gradient">Khách Hàng Nói Gì</h2>
+        <p class="text-muted">Đánh giá từ khách hàng đã mua sắm tại Laptop World</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="mb-3">
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+              </div>
+              <p class="mb-3">"Laptop chất lượng tuyệt vời, giá rất hợp lý. Nhân viên tư vấn nhiệt tình và chuyên
+                nghiệp. Tôi rất hài lòng!"</p>
+              <div class="d-flex align-items-center">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width: 50px; height: 50px;">
+                  <strong>NH</strong>
+                </div>
+                <div>
+                  <strong>Nguyễn Hoàng</strong>
+                  <div class="text-muted small">Khách hàng thân thiết</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="mb-3">
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+              </div>
+              <p class="mb-3">"Giao hàng nhanh, sản phẩm đóng gói cẩn thận. Laptop chạy mượt mà, đúng như mô tả. Sẽ ủng
+                hộ lâu dài!"</p>
+              <div class="d-flex align-items-center">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width: 50px; height: 50px;">
+                  <strong>TA</strong>
+                </div>
+                <div>
+                  <strong>Trần Anh</strong>
+                  <div class="text-muted small">Khách hàng mới</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="mb-3">
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+                <i class="fas fa-star" style="color: #ffc107;"></i>
+              </div>
+              <p class="mb-3">"Mua laptop gaming ở đây giá tốt hơn nhiều nơi khác. Sau bán hàng chu đáo, bảo hành tốt.
+                Rất recommend!"</p>
+              <div class="d-flex align-items-center">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width: 50px; height: 50px;">
+                  <strong>LM</strong>
+                </div>
+                <div>
+                  <strong>Lê Minh</strong>
+                  <div class="text-muted small">Game thủ</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Container -->
+  <div id="footer-container"></div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/components/header.js"></script>
+  <script src="js/components/footer.js"></script>
+  <script src="js/cart-api.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/flashsale.js"></script>
+
+  <!-- Page-specific JS -->
+  <script>
+    // Load featured products from API
+    document.addEventListener('DOMContentLoaded', async function () {
+      const featuredContainer = document.getElementById('featuredProducts');
+      featuredContainer.innerHTML = '<div class="col-12 text-center"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+      
+      try {
+        const response = await fetch('http://localhost:3000/api/products?limit=6');
+        const result = await response.json();
         
-        // Load product cards
-        for(let i = 1; i <= 8; i++) {
-            loadComponent(`product-card-${i}`, 'components/product-card.html');
+        if (result.success && result.data.products) {
+          featuredContainer.innerHTML = '';
+          const products = result.data.products.map(p => ({
+            id: p.IdSanPham,
+            name: p.TenSanPham,
+            brand: p.TenThuongHieu || 'Không rõ',
+            price: p.GiaSanPham,
+            oldPrice: p.GiaGoc,
+            image: p.AnhChinh,
+            description: p.MoTaSanPham || 'Chưa có mô tả',
+            rating: 4.5,
+            badge: p.GiaGoc && p.GiaGoc > p.GiaSanPham ? 'sale' : null
+          }));
+          
+          products.forEach(product => {
+            const productCard = createProductCard(product);
+            featuredContainer.appendChild(productCard);
+          });
+        } else {
+          featuredContainer.innerHTML = '<div class="col-12 text-center text-muted">Không có sản phẩm</div>';
         }
-    </script>
+      } catch (error) {
+        console.error('Load products error:', error);
+        featuredContainer.innerHTML = '<div class="col-12 text-center text-danger">Không thể kết nối đến server</div>';
+      }
+    });
+
+    // Placeholder image as data URI
+    const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+
+    // Get proper image URL
+    function getImageUrl(imagePath) {
+      if (!imagePath) return PLACEHOLDER_IMAGE;
+      if (imagePath.startsWith('data:')) return imagePath;
+      if (imagePath.startsWith('http')) return imagePath;
+      if (imagePath.startsWith('/uploads')) return 'http://localhost:3000' + imagePath;
+      if (imagePath.includes('product-')) return 'http://localhost:3000/uploads/products/' + imagePath;
+      return imagePath;
+    }
+
+    // Create product card
+    function createProductCard(product) {
+      const col = document.createElement('div');
+      col.className = 'col';
+
+      const badge = product.badge ? `<div class="badge badge-${product.badge === 'sale' ? 'sale' : 'new'}">${product.badge === 'sale' ? 'SALE' : 'MỚI'}</div>` : '';
+
+      const imageUrl = getImageUrl(product.image);
+      
+      // Truncate description to 60 chars
+      const shortDesc = product.description ? (product.description.length > 60 ? product.description.substring(0, 60) + '...' : product.description) : 'Laptop chính hãng';
+
+      col.innerHTML = `
+        <div class="card product-card h-100">
+          ${badge}
+          <img src="${imageUrl}" class="card-img-top" alt="${product.name}" onerror="this.onerror=null; this.src='${PLACEHOLDER_IMAGE}'">
+          <div class="card-body">
+            <div class="product-brand">${product.brand}</div>
+            <h5 class="card-title">${product.name}</h5>
+            <div class="product-specs">
+              <small><i class="fas fa-microchip text-primary"></i> ${shortDesc}</small>
+            </div>
+            <div class="product-rating">
+              ${generateStars(product.rating)}
+              <span class="text-muted small">(${product.rating})</span>
+            </div>
+            <div class="product-price-section">
+              <div class="product-price text-danger fw-bold fs-5">${formatCurrency(product.price)}</div>
+              ${product.oldPrice ? `<small class="text-muted text-decoration-line-through">${formatCurrency(product.oldPrice)}</small>` : ''}
+            </div>
+          </div>
+          <div class="card-footer bg-transparent border-0 p-3 pt-0">
+            <div class="d-grid gap-2">
+              <a href="product-detail.html?id=${product.id}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-info-circle"></i> Chi tiết
+              </a>
+              <button class="btn btn-primary btn-sm" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      return col;
+    }
+
+    // Generate star rating
+    function generateStars(rating) {
+      let stars = '';
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 !== 0;
+
+      for (let i = 0; i < fullStars; i++) {
+        stars += '<i class="fas fa-star" style="color: #ffc107;"></i>';
+      }
+
+      if (hasHalfStar) {
+        stars += '<i class="fas fa-star-half-alt" style="color: #ffc107;"></i>';
+      }
+
+      const emptyStars = 5 - Math.ceil(rating);
+      for (let i = 0; i < emptyStars; i++) {
+        stars += '<i class="far fa-star" style="color: #ffc107;"></i>';
+      }
+
+      return stars;
+    }
+  </script>
+
+  <!-- Scroll to Top Button -->
+  <script src="js/components/scroll-to-top.js"></script>
 </body>
+
 </html>

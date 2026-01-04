@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Laptop World</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        section {
+            flex: 1;
+        }
+
+        .border-left-primary {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .border-left-success {
+            border-left: 4px solid #28a745;
+        }
+
+        .border-left-info {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .border-left-warning {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .text-xs {
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header-container"></div>
+
+    <section class="py-3">
+        <div class="container-fluid">
+            <!-- Admin Navigation Tabs -->
+            <div id="admin-nav-container"></div>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="adminTabsContent">
+                <!-- Products Tab -->
+                <div class="tab-pane fade show active" id="products" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Quản lý sản phẩm</h5>
+                                <button class="btn btn-primary" onclick="showAddProductModal()">
+                                    <i class="fas fa-plus"></i> Thêm sản phẩm
+                                </button>
+                            </div>
+
+                            <!-- Search and Filters -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="productSearch"
+                                        placeholder="Tìm kiếm tên sản phẩm..."
+                                        onkeyup="if(event.key==='Enter') searchProducts()">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-outline-primary w-100" onclick="searchProducts()">
+                                        <i class="fas fa-search"></i> Tìm
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th width="60">ID</th>
+                                            <th>Sản phẩm</th>
+                                            <th>Thương hiệu</th>
+                                            <th>Giá</th>
+                                            <th>Kho</th>
+                                            <th>Trạng thái</th>
+                                            <th width="120">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTable">
+                                        <tr>
+                                            <td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i>
+                                                Đang tải...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="productsPagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Tab -->
+                <div class="tab-pane fade" id="orders" role="tabpanel">
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Chờ xử lý</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="orderStatsChoXuLy">0</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Đang giao</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="orderStatsDangGiao">0</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-shipping-fast fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Đã giao</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="orderStatsDaGiao">0</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Đã hủy</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="orderStatsDaHuy">0</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-times-circle fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-4">Quản lý đơn hàng</h5>
+                            
+                            <!-- Filters -->
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <select class="form-select" id="orderStatusFilter" onchange="filterOrders()">
+                                        <option value="">Tất cả trạng thái</option>
+                                        <option value="Cho xu ly">Chờ xử lý</option>
+                                        <option value="Xac nhan">Đã xác nhận</option>
+                                        <option value="Dang giao">Đang giao</option>
+                                        <option value="Da giao">Đã giao</option>
+                                        <option value="Da huy">Đã hủy</option>
+                                        <option value="HoanTien">Hoàn tiền</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" id="orderSearchInput" 
+                                        placeholder="Tìm mã đơn, khách hàng..." 
+                                        onkeyup="if(event.key==='Enter') filterOrders()">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-outline-primary w-100" onclick="filterOrders()">
+                                        <i class="fas fa-search"></i> Tìm
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="80">Mã đơn</th>
+                                            <th>Khách hàng</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Trạng thái</th>
+                                            <th width="200">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ordersTableBody">
+                                        <tr>
+                                            <td colspan="6" class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="ordersPagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Tab -->
+                <div class="tab-pane fade" id="users" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Quản lý người dùng</h5>
+                                <button class="btn btn-primary" onclick="showAddUserModal()">
+                                    <i class="fas fa-user-plus"></i> Thêm người dùng
+                                </button>
+                            </div>
+
+                            <!-- Search and Filters -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="userSearch"
+                                        placeholder="Tìm kiếm tên, email, SĐT..."
+                                        onkeyup="if(event.key==='Enter') searchUsers()">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="roleFilter" onchange="searchUsers()">
+                                        <option value="">Tất cả vai trò</option>
+                                        <option value="user">Khách hàng</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="statusFilter" onchange="searchUsers()">
+                                        <option value="">Tất cả trạng thái</option>
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Bị khóa</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-outline-primary w-100" onclick="searchUsers()">
+                                        <i class="fas fa-search"></i> Tìm
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="60">ID</th>
+                                            <th>Tên</th>
+                                            <th>Email</th>
+                                            <th>Điện thoại</th>
+                                            <th>Vai trò</th>
+                                            <th>Trạng thái</th>
+                                            <th>Ngày đăng ký</th>
+                                            <th width="200">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersTableBody">
+                                        <tr>
+                                            <td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i>
+                                                Đang tải...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="usersPagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flash Sale Tab -->
+                <div class="tab-pane fade" id="flashsale" role="tabpanel">
+                    <!-- Flash Sale Products -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Quản lý Flash Sale</h5>
+                                <button class="btn btn-primary" onclick="showAddFlashSaleProductModal()">
+                                    <i class="fas fa-plus"></i> Thêm sản phẩm
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="80">Hình</th>
+                                            <th>Sản phẩm</th>
+                                            <th>Giá gốc</th>
+                                            <th>Giá sale</th>
+                                            <th>Giảm</th>
+                                            <th>Số lượng</th>
+                                            <th>Đã bán</th>
+                                            <th width="120">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="flashsaleProductsBody">
+                                        <tr>
+                                            <td colspan="8" class="text-center">Đang tải...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Tab -->
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-4">Quản lý Bình luận & Đánh giá</h5>
+                            
+                            <!-- Search and Filters -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="reviewSearch"
+                                        placeholder="Tìm kiếm theo tên, nội dung..."
+                                        onkeyup="if(event.key==='Enter') searchReviews()">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="reviewProductFilter" onchange="searchReviews()">
+                                        <option value="">Tất cả sản phẩm</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-outline-primary w-100" onclick="searchReviews()">
+                                        <i class="fas fa-search"></i> Tìm
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="60">ID</th>
+                                            <th>Người dùng</th>
+                                            <th>Sản phẩm</th>
+                                            <th>Đánh giá</th>
+                                            <th>Nội dung</th>
+                                            <th>Ngày tạo</th>
+                                            <th width="150">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="reviewsTableBody">
+                                        <tr>
+                                            <td colspan="7" class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="reviewsPagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contacts Tab -->
+                <div class="tab-pane fade" id="contacts" role="tabpanel">
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng liên hệ</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="contactStatsTotal">0</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-envelope fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Chưa đọc</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="contactStatsNew">0</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-exclamation-circle fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Đã trả lời</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="contactStatsReplied">0</div>
+                                        </div>
+                                        <div class="col-auto"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-4">Quản lý Liên hệ</h5>
+                            
+                            <!-- Filters -->
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <select class="form-select" id="contactStatusFilter" onchange="filterContacts()">
+                                        <option value="">Tất cả trạng thái</option>
+                                        <option value="Moi">Mới</option>
+                                        <option value="Da Doc">Đã đọc</option>
+                                        <option value="Da tra loi">Đã trả lời</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="60">ID</th>
+                                            <th>Người gửi</th>
+                                            <th>SĐT</th>
+                                            <th>Chủ đề</th>
+                                            <th>Nội dung</th>
+                                            <th>Trạng thái</th>
+                                            <th>Ngày gửi</th>
+                                            <th width="150">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="contactsTableBody">
+                                        <tr>
+                                            <td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="contactsPagination"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-container"></div>
+
+    <!-- User Add/Edit Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalTitle">Thêm Người Dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="userForm" onsubmit="saveUser(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="userId">
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Họ tên *</label>
+                            <input type="text" class="form-control" id="userName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="userEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPhone" class="form-label">Số điện thoại</label>
+                            <input type="tel" class="form-control" id="userPhone">
+                        </div>
+                        <div class="mb-3" id="userPasswordGroup">
+                            <label for="userPassword" class="form-label">Mật khẩu *</label>
+                            <input type="password" class="form-control" id="userPassword" required minlength="6">
+                            <div class="form-text">Tối thiểu 6 ký tự</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userRole" class="form-label">Vai trò</label>
+                            <select class="form-select" id="userRole">
+                                <option value="user">Khách hàng</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="userStatus" checked>
+                            <label class="form-check-label" for="userStatus">Kích hoạt tài khoản</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal fade" id="userDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi Tiết Người Dùng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Thông tin cá nhân</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="120">Họ tên:</th>
+                                    <td id="detailUserName"></td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td id="detailUserEmail"></td>
+                                </tr>
+                                <tr>
+                                    <th>Điện thoại:</th>
+                                    <td id="detailUserPhone"></td>
+                                </tr>
+                                <tr>
+                                    <th>Vai trò:</th>
+                                    <td id="detailUserRole"></td>
+                                </tr>
+                                <tr>
+                                    <th>Trạng thái:</th>
+                                    <td id="detailUserStatus"></td>
+                                </tr>
+                                <tr>
+                                    <th>Ngày tạo:</th>
+                                    <td id="detailUserCreated"></td>
+                                </tr>
+                                <tr>
+                                    <th>Cập nhật:</th>
+                                    <td id="detailUserUpdated"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Thống kê hoạt động</h6>
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h3 id="detailTotalOrders" class="text-primary mb-0">0</h3><small
+                                        class="text-muted">Tổng đơn hàng</small>
+                                </div>
+                            </div>
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <h3 id="detailTotalSpent" class="text-success mb-0">0đ</h3><small
+                                        class="text-muted">Tổng chi tiêu</small>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h3 id="detailTotalReviews" class="text-warning mb-0">0</h3><small
+                                        class="text-muted">Đánh giá đã viết</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đặt lại mật khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form onsubmit="resetUserPassword(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="resetPasswordUserId">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Đặt lại mật khẩu cho: <strong id="resetPasswordUserName"></strong>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mật khẩu mới</label>
+                            <input type="password" class="form-control" id="newPassword" required minlength="6">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Xác nhận mật khẩu</label>
+                            <input type="password" class="form-control" id="confirmNewPassword" required minlength="6">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Add/Edit Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalTitle">Thêm Sản Phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="productForm" onsubmit="saveProduct(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="productId">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="productName" class="form-label">Tên sản phẩm *</label>
+                                    <input type="text" class="form-control" id="productName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="productStatus" class="form-label">Trạng thái</label>
+                                    <select class="form-select" id="productStatus">
+                                        <option value="DangBan">Đang bán</option>
+                                        <option value="NgungBan">Ngừng bán</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productCategory" class="form-label">Danh mục</label>
+                                    <select class="form-select" id="productCategory">
+                                        <option value="">-- Chọn danh mục --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productBrand" class="form-label">Thương hiệu</label>
+                                    <select class="form-select" id="productBrand">
+                                        <option value="">-- Chọn thương hiệu --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productPrice" class="form-label">Giá (VNĐ) *</label>
+                                    <input type="number" class="form-control" id="productPrice" required min="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productQuantity" class="form-label">Số lượng kho</label>
+                                    <input type="number" class="form-control" id="productQuantity" value="0" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productImages" class="form-label">Hình ảnh sản phẩm (Chọn nhiều ảnh)</label>
+                            <input type="file" class="form-control" id="productImages" accept="image/*" multiple
+                                onchange="previewProductImages(this)">
+                            <div class="form-text">Chấp nhận: JPG, PNG, GIF, WEBP (tối đa 5MB/ảnh). Ảnh đầu tiên sẽ là ảnh chính.</div>
+                            <div id="imagesPreview" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productDesc" class="form-label">Mô tả sản phẩm</label>
+                            <textarea class="form-control" id="productDesc" rows="4"></textarea>
+                        </div>
+
+                        <!-- Technical Specifications -->
+                        <h6 class="mt-4 mb-3 text-primary"><i class="fas fa-cogs"></i> Thông số kỹ thuật</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productStorage" class="form-label">Kiểu ổ cứng</label>
+                                    <select class="form-select" id="productStorage">
+                                        <option value="">-- Chọn kiểu ổ cứng --</option>
+                                        <option value="SSD">SSD</option>
+                                        <option value="HDD">HDD</option>
+                                        <option value="SSD + HDD">SSD + HDD</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productStorageSize" class="form-label">Dung lượng ổ cứng</label>
+                                    <select class="form-select" id="productStorageSize">
+                                        <option value="">-- Chọn dung lượng --</option>
+                                        <option value="128GB">128GB</option>
+                                        <option value="256GB">256GB</option>
+                                        <option value="512GB">512GB</option>
+                                        <option value="1TB">1TB</option>
+                                        <option value="2TB">2TB</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productScreenTech" class="form-label">Công nghệ màn hình</label>
+                                    <select class="form-select" id="productScreenTech">
+                                        <option value="">-- Chọn công nghệ --</option>
+                                        <option value="IPS">IPS</option>
+                                        <option value="OLED">OLED</option>
+                                        <option value="TN">TN</option>
+                                        <option value="VA">VA</option>
+                                        <option value="Retina">Retina</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productRefreshRate" class="form-label">Tần số quét</label>
+                                    <select class="form-select" id="productRefreshRate">
+                                        <option value="">-- Chọn tần số --</option>
+                                        <option value="60Hz">60Hz</option>
+                                        <option value="90Hz">90Hz</option>
+                                        <option value="120Hz">120Hz</option>
+                                        <option value="144Hz">144Hz</option>
+                                        <option value="165Hz">165Hz</option>
+                                        <option value="240Hz">240Hz</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productResolution" class="form-label">Độ phân giải</label>
+                                    <select class="form-select" id="productResolution">
+                                        <option value="">-- Chọn độ phân giải --</option>
+                                        <option value="HD (1366x768)">HD (1366x768)</option>
+                                        <option value="FHD (1920x1080)">FHD (1920x1080)</option>
+                                        <option value="2K (2560x1440)">2K (2560x1440)</option>
+                                        <option value="4K (3840x2160)">4K (3840x2160)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productBattery" class="form-label">Pin</label>
+                                    <select class="form-select" id="productBattery">
+                                        <option value="">-- Chọn dung lượng pin --</option>
+                                        <option value="40Wh">40Wh</option>
+                                        <option value="50Wh">50Wh</option>
+                                        <option value="60Wh">60Wh</option>
+                                        <option value="70Wh">70Wh</option>
+                                        <option value="80Wh">80Wh</option>
+                                        <option value="90Wh">90Wh</option>
+                                        <option value="100Wh">100Wh</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productOrigin" class="form-label">Xuất xứ</label>
+                                    <select class="form-select" id="productOrigin">
+                                        <option value="">-- Chọn xuất xứ --</option>
+                                        <option value="Trung Quốc">Trung Quốc</option>
+                                        <option value="Việt Nam">Việt Nam</option>
+                                        <option value="Thái Lan">Thái Lan</option>
+                                        <option value="USA">USA</option>
+                                        <option value="Đài Loan">Đài Loan</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productWeight" class="form-label">Trọng lượng</label>
+                                    <select class="form-select" id="productWeight">
+                                        <option value="">-- Chọn trọng lượng --</option>
+                                        <option value="< 1.5kg">< 1.5kg</option>
+                                        <option value="1.5 - 2.0kg">1.5 - 2.0kg</option>
+                                        <option value="2.0 - 2.5kg">2.0 - 2.5kg</option>
+                                        <option value="> 2.5kg">> 2.5kg</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Sale Product Modal -->
+    <div class="modal fade" id="flashsaleProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fsProductModalTitle">Thêm sản phẩm Flash Sale</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="fsProductForm" onsubmit="saveFlashSaleProduct(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="fsProductId">
+                        <div class="mb-3">
+                            <label class="form-label">Chọn sản phẩm *</label>
+                            <select class="form-select" id="fsProductSelect" required>
+                                <option value="">-- Chọn sản phẩm --</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giá gốc</label>
+                            <input type="text" class="form-control" id="fsOriginalPrice" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giá Flash Sale *</label>
+                            <input type="number" class="form-control" id="fsSalePrice" required min="1000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số lượng giới hạn *</label>
+                            <input type="number" class="form-control" id="fsQuantity" value="10" required min="1">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ngày bắt đầu *</label>
+                                <input type="datetime-local" class="form-control" id="fsStartDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ngày kết thúc *</label>
+                                <input type="datetime-local" class="form-control" id="fsEndDate" required>
+                            </div>
+                        </div>
+                        <div class="alert alert-info small mb-0">
+                            <i class="fas fa-info-circle"></i> Flash Sale chỉ hiển thị ở trang chủ trong khoảng thời gian này. Nếu không có sản phẩm flash sale hoặc hết thời gian, phần flash sale sẽ tự động ẩn.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Reply Modal -->
+    <div class="modal fade" id="adminReplyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Trả lời bình luận</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="adminReplyForm" onsubmit="submitAdminReply(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="adminReplyReviewId">
+                        <div class="mb-3">
+                            <label class="form-label">Bình luận gốc:</label>
+                            <div class="alert alert-secondary" id="adminReplyOriginal"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung trả lời *</label>
+                            <textarea class="form-control" id="adminReplyContent" rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-reply"></i> Gửi trả lời</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Contact Modal -->
+    <div class="modal fade" id="viewContactModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết liên hệ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="viewContactContent">
+                    <p class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply Contact Modal -->
+    <div class="modal fade" id="replyContactModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Phản hồi liên hệ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form onsubmit="submitReply(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="replyContactId">
+                        <div class="alert alert-info" id="replyContactInfo"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung phản hồi * <span class="text-muted small">(Tối đa 100 từ)</span></label>
+                            <textarea class="form-control" id="replyContent" rows="5" required placeholder="Nhập nội dung phản hồi..." oninput="countReplyWords(this)"></textarea>
+                            <div class="form-text">
+                                <span id="replyWordCount">0</span>/100 từ
+                                <span id="replyWordCountWarning" class="text-danger ms-2" style="display:none;">⚠️ Vượt quá giới hạn!</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-reply"></i> Gửi phản hồi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div class="modal fade" id="orderDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="orderDetailContent">
+                    <p class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Order Status Modal -->
+    <div class="modal fade" id="updateOrderStatusModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cập nhật trạng thái đơn hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form onsubmit="submitUpdateOrderStatus(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="updateOrderId">
+                        <div class="alert alert-info" id="updateOrderInfo"></div>
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái mới *</label>
+                            <select class="form-select" id="updateOrderStatus" required>
+                                <option value="">-- Chọn trạng thái --</option>
+                                <option value="Cho xu ly">Chờ xử lý</option>
+                                <option value="Xac nhan">Đã xác nhận</option>
+                                <option value="Dang giao">Đang giao</option>
+                                <option value="Da giao">Đã giao</option>
+                                <option value="Da huy">Đã hủy</option>
+                                <option value="HoanTien">Hoàn tiền</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/chatbot.js"></script>
+    <script src="js/admin-users.js"></script>
+    <script src="js/admin-products.js"></script>
+    <script src="js/admin-orders.js"></script>
+    <script src="js/admin-flashsale.js"></script>
+    <script src="js/admin-reviews.js"></script>
+    <script src="js/admin-contacts.js"></script>
+    <script src="js/admin-init.js"></script>
+
+    <script>
+        // Check admin access on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+
+            if (!token || !userStr) {
+                alert('Vui lòng đăng nhập để truy cập trang quản trị');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+            if (user.vaiTro !== 'admin') {
+                alert('Bạn không có quyền truy cập trang này. Chỉ admin mới có quyền.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Load admin navigation component
+            fetch('admin-nav.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('admin-nav-container').innerHTML = data;
+                    
+                    // Load admin nav script after component is loaded
+                    const script = document.createElement('script');
+                    script.src = 'js/admin-nav.js';
+                    document.body.appendChild(script);
+                })
+                .catch(err => console.error('Failed to load admin nav:', err));
+        });
+    </script>
+
+  <!-- Scroll to Top Button -->
+  <script src="js/components/scroll-to-top.js"></script>
+</body>
+
+</html>

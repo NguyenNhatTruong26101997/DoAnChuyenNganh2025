@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Danh sách sản phẩm laptop chính hãng tại Laptop World. Dell, HP, Asus, Lenovo, MSI, Acer.">
+    <title>Sản phẩm - Laptop World</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Header Container -->
+    <div id="header-container"></div>
+
+    <!-- Products Section -->
+    <section class="py-4">
+        <div class="container">
+            <div class="row">
+                <!-- Sidebar Filters -->
+                <div class="col-lg-3 mb-4">
+                    <div class="card sticky-top" style="top: 100px; max-height: calc(100vh - 120px); overflow-y: auto;">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4"><i class="fas fa-filter"></i> Bộ lọc</h5>
+
+                            <!-- Brand Filter -->
+                            <div class="mb-4">
+                                <h6>Thương hiệu</h6>
+                                <div id="brandFilters">
+                                    <div class="text-muted small">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Category Filter -->
+                            <div class="mb-4">
+                                <h6>Danh mục</h6>
+                                <div id="categoryFilters">
+                                    <div class="text-muted small">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Price Filter -->
+                            <div class="mb-4">
+                                <h6>Khoảng giá</h6>
+                                <div class="form-check">
+                                    <input class="form-check-input price-filter" type="radio" name="priceRange"
+                                        value="0-20" id="price1">
+                                    <label class="form-check-label" for="price1">Dưới 20 triệu</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input price-filter" type="radio" name="priceRange"
+                                        value="20-30" id="price2">
+                                    <label class="form-check-label" for="price2">20 - 30 triệu</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input price-filter" type="radio" name="priceRange"
+                                        value="30-40" id="price3">
+                                    <label class="form-check-label" for="price3">30 - 40 triệu</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input price-filter" type="radio" name="priceRange"
+                                        value="40-999" id="price4">
+                                    <label class="form-check-label" for="price4">Trên 40 triệu</label>
+                                </div>
+                            </div>
+
+                            <!-- Sort -->
+                            <div class="mb-4">
+                                <h6>Sắp xếp</h6>
+                                <select class="form-select" id="sortSelect">
+                                    <option value="">Mặc định</option>
+                                    <option value="price-asc">Giá: Thấp đến cao</option>
+                                    <option value="price-desc">Giá: Cao đến thấp</option>
+                                    <option value="name-asc">Tên: A-Z</option>
+                                    <option value="name-desc">Tên: Z-A</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="fas fa-redo"></i> Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="col-lg-9">
+                    <!-- Result Info -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="mb-0">Hiển thị <span id="resultCount">0</span> sản phẩm</h5>
+                        </div>
+                    </div>
+
+                    <!-- Products -->
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="productsGrid">
+                        <!-- Products will be loaded here -->
+                    </div>
+
+                    <!-- No Results -->
+                    <div id="noResults" class="text-center py-5" style="display: none;">
+                        <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                        <h4>Không tìm thấy sản phẩm</h4>
+                        <p class="text-muted">Vui lòng thử lại với bộ lọc khác</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/cart-api.js"></script>
+    <script src="js/chatbot.js"></script>
+    <script src="js/products.js"></script>
+
+    <!-- Page-specific JS (deprecated - moved to products.js) --><!--
+    <script>
+        let allProducts = [];
+        let filteredProducts = [];
+
+        // Load products on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            allProducts = getProducts();
+
+            // Check for URL parameters
+            const searchTerm = getUrlParameter('search');
+            if (searchTerm) {
+                allProducts = getProducts({ search: searchTerm });
+            }
+
+            filteredProducts = [...allProducts];
+            displayProducts();
+
+            // Add event listeners
+            setupFilterListeners();
+        });
+
+        // Display products
+        function displayProducts() {
+            const grid = document.getElementById('productsGrid');
+            const noResults = document.getElementById('noResults');
+            const resultCount = document.getElementById('resultCount');
+
+            grid.innerHTML = '';
+
+            if (filteredProducts.length === 0) {
+                noResults.style.display = 'block';
+                resultCount.textContent = '0';
+                return;
+            }
+
+            noResults.style.display = 'none';
+            resultCount.textContent = filteredProducts.length;
+
+            filteredProducts.forEach(product => {
+                const productCard = createProductCard(product);
+                grid.appendChild(productCard);
+            });
+        }
+
+        // Create product card
+        function createProductCard(product) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4';
+
+            const badge = product.badge ? `<span class="badge badge-${product.badge === 'sale' ? 'sale' : 'new'}">${product.badge === 'sale' ? 'SALE' : 'MỚI'}</span>` : '';
+            const oldPrice = product.oldPrice ? `<span class="product-old-price">${formatCurrency(product.oldPrice)}</span>` : '';
+
+            col.innerHTML = `
+        <div class="card product-card h-100">
+          ${badge}
+          <img src="${product.image}" class="card-img-top" alt="${product.name}">
+          <div class="card-body">
+            <div class="text-muted small mb-1">${product.brand}</div>
+            <h5 class="card-title">${product.name}</h5>
+            <p class="card-text text-muted small">${product.description}</p>
+            <div class="mb-2">
+              ${generateStars(product.rating)}
+              <span class="text-muted small">(${product.rating})</span>
+            </div>
+            <div class="mb-3">
+              <div class="product-price">${formatCurrency(product.price)}</div>
+              ${oldPrice}
+            </div>
+          </div>
+          <div class="card-footer bg-transparent border-0 p-3">
+            <div class="d-grid gap-2">
+              <a href="product-detail.html?id=${product.id}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-info-circle"></i> Chi tiết
+              </a>
+              <button class="btn btn-primary btn-sm" onclick='addToCart(${JSON.stringify(product).replace(/'/g, "\\'")}); event.stopPropagation();'>
+                <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+            return col;
+        }
+
+        // Setup filter listeners
+        function setupFilterListeners() {
+            // Brand filters
+            document.querySelectorAll('.brand-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', applyFilters);
+            });
+
+            // Price filters
+            document.querySelectorAll('.price-filter').forEach(radio => {
+                radio.addEventListener('change', applyFilters);
+            });
+
+            // Sort
+            document.getElementById('sortSelect').addEventListener('change', applySort);
+        }
+
+        // Apply filters
+        function applyFilters() {
+            filteredProducts = [...allProducts];
+
+            // Brand filter
+            const selectedBrands = Array.from(document.querySelectorAll('.brand-filter:checked')).map(cb => cb.value);
+            if (selectedBrands.length > 0) {
+                filteredProducts = filteredProducts.filter(p => selectedBrands.includes(p.brand));
+            }
+
+            // Price filter
+            const selectedPrice = document.querySelector('.price-filter:checked');
+            if (selectedPrice) {
+                const [min, max] = selectedPrice.value.split('-').map(v => parseInt(v) * 1000000);
+                filteredProducts = filteredProducts.filter(p => p.price >= min && p.price <= max);
+            }
+
+            // Apply current sort
+            applySort();
+        }
+
+        // Apply sort
+        function applySort() {
+            const sortValue = document.getElementById('sortSelect').value;
+
+            if (!sortValue) {
+                displayProducts();
+                return;
+            }
+
+            switch (sortValue) {
+                case 'price-asc':
+                    filteredProducts.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-desc':
+                    filteredProducts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name-asc':
+                    filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'name-desc':
+                    filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+                    break;
+            }
+
+            displayProducts();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.querySelectorAll('.brand-filter').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.price-filter').forEach(radio => radio.checked = false);
+            document.getElementById('sortSelect').value = '';
+
+            filteredProducts = [...allProducts];
+            displayProducts();
+        }
+
+        // Generate star rating
+        function generateStars(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star" style="color: #ffc107;"></i>';
+            }
+
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt" style="color: #ffc107;"></i>';
+            }
+
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star" style="color: #ffc107;"></i>';
+            }
+
+            return stars;
+        }
+    --></script>
+
+  <!-- Scroll to Top Button -->
+  <script src="js/components/scroll-to-top.js"></script>
+</body>
+
+</html>

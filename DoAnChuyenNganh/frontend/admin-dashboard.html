@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống Kê - Laptop World</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            height: 100%;
+            transition: transform 0.2s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .stats-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-icon.blue { background: #e3f2fd; color: #1976d2; }
+        .stats-icon.green { background: #e8f5e9; color: #388e3c; }
+        .stats-icon.orange { background: #fff3e0; color: #f57c00; }
+        .stats-icon.purple { background: #f3e5f5; color: #7b1fa2; }
+
+        .stats-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #212529;
+            margin: 0.5rem 0;
+        }
+
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        canvas {
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <section class="py-4">
+        <div class="container-fluid">
+            <!-- Admin Navigation -->
+            <div id="admin-nav-container"></div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <label class="form-label mb-2">Tháng</label>
+                        <select class="form-select" id="monthFilter" onchange="loadDashboard()">
+                            <option value="">Tất cả</option>
+                            <option value="1">Tháng 1</option>
+                            <option value="2">Tháng 2</option>
+                            <option value="3">Tháng 3</option>
+                            <option value="4">Tháng 4</option>
+                            <option value="5">Tháng 5</option>
+                            <option value="6">Tháng 6</option>
+                            <option value="7">Tháng 7</option>
+                            <option value="8">Tháng 8</option>
+                            <option value="9">Tháng 9</option>
+                            <option value="10">Tháng 10</option>
+                            <option value="11">Tháng 11</option>
+                            <option value="12">Tháng 12</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-2">Năm</label>
+                        <select class="form-select" id="yearFilter" onchange="loadDashboard()">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <label class="form-label mb-2 d-block">&nbsp;</label>
+                        <button class="btn btn-primary" onclick="loadDashboard()">
+                            <i class="fas fa-sync-alt me-2"></i>Làm mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon blue">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stats-label">Doanh thu</div>
+                        <div class="stats-value" id="totalRevenue">0đ</div>
+                        <small class="text-muted">Từ đơn đã giao</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon green">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stats-label">Đơn hàng</div>
+                        <div class="stats-value" id="totalOrders">0</div>
+                        <small class="text-success" id="successOrders">0 thành công</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon orange">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-label">Khách hàng</div>
+                        <div class="stats-value" id="totalCustomers">0</div>
+                        <small class="text-muted">Đã mua hàng</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon purple">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stats-label">Sản phẩm bán</div>
+                        <div class="stats-value" id="totalProducts">0</div>
+                        <small class="text-muted">Tổng số lượng</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <div class="chart-container">
+                        <h6 class="chart-title">Doanh thu theo tháng</h6>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="chart-container">
+                        <h6 class="chart-title">Trạng thái đơn hàng</h6>
+                        <canvas id="orderStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Products Table -->
+            <div class="table-container">
+                <h6 class="chart-title">Top 10 sản phẩm bán chạy</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="50">#</th>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">Đã bán</th>
+                                <th class="text-end">Doanh thu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topProductsTable">
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/chatbot.js"></script>
+    <script src="js/components/scroll-to-top.js"></script>
+
+    <script>
+        let revenueChart = null;
+        let orderStatusChart = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAuth();
+            
+            // Set current year
+            document.getElementById('yearFilter').value = new Date().getFullYear();
+            
+            // Load admin nav
+            fetch('admin-nav.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('admin-nav-container').innerHTML = data;
+                    const script = document.createElement('script');
+                    script.src = 'js/admin-nav.js';
+                    document.body.appendChild(script);
+                })
+                .catch(err => console.error('Failed to load admin nav:', err));
+            
+            loadDashboard();
+        });
+
+        function checkAdminAuth() {
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            
+            if (!token || !userStr) {
+                alert('Vui lòng đăng nhập để truy cập trang quản trị');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+            if (user.vaiTro !== 'admin' && user.vaiTro !== 'Admin') {
+                alert('Bạn không có quyền truy cập trang này');
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+
+        async function loadDashboard() {
+            const month = document.getElementById('monthFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            
+            try {
+                let url = `/admin/statistics?year=${year}`;
+                if (month) url += `&month=${month}`;
+                
+                const response = await api.get(url);
+                
+                if (response.success && response.data) {
+                    updateStats(response.data);
+                    updateCharts(response.data);
+                    updateTopProducts(response.data);
+                } else {
+                    showNotification('Không thể tải dữ liệu thống kê', 'error');
+                }
+            } catch (error) {
+                console.error('Load dashboard error:', error);
+                showNotification('Lỗi kết nối đến server', 'error');
+            }
+        }
+
+        function updateStats(data) {
+            const overview = data.overview || {};
+            
+            // Doanh thu
+            document.getElementById('totalRevenue').textContent = formatCurrency(overview.doanhThu || 0);
+            
+            // Đơn hàng
+            document.getElementById('totalOrders').textContent = overview.tongDon || 0;
+            document.getElementById('successOrders').textContent = `${overview.donThanhCong || 0} thành công`;
+            
+            // Khách hàng
+            document.getElementById('totalCustomers').textContent = overview.soKhachHang || 0;
+            
+            // Sản phẩm
+            document.getElementById('totalProducts').textContent = overview.sanPhamDaBan || 0;
+        }
+
+        function updateCharts(data) {
+            // Revenue Chart
+            const monthlyRevenue = data.monthlyRevenue || [];
+            const months = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+            const revenueData = new Array(12).fill(0);
+            
+            monthlyRevenue.forEach(item => {
+                if (item.thang >= 1 && item.thang <= 12) {
+                    revenueData[item.thang - 1] = item.doanhThu;
+                }
+            });
+
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueChart) revenueChart.destroy();
+            
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Doanh thu (VNĐ)',
+                        data: revenueData,
+                        borderColor: '#1976d2',
+                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Doanh thu: ' + formatCurrency(context.parsed.y);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000000).toFixed(0) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Order Status Chart
+            const orderStatus = data.orderStatus || [];
+            const statusLabels = [];
+            const statusData = [];
+            const statusColors = {
+                'Cho xu ly': '#ff9800',
+                'Xac nhan': '#2196f3',
+                'Dang giao': '#03a9f4',
+                'Da giao': '#4caf50',
+                'Da huy': '#f44336',
+                'HoanTien': '#9c27b0'
+            };
+            const statusNames = {
+                'Cho xu ly': 'Chờ xử lý',
+                'Xac nhan': 'Đã xác nhận',
+                'Dang giao': 'Đang giao',
+                'Da giao': 'Đã giao',
+                'Da huy': 'Đã hủy',
+                'HoanTien': 'Hoàn tiền'
+            };
+
+            orderStatus.forEach(item => {
+                statusLabels.push(statusNames[item.TrangThaiDonHang] || item.TrangThaiDonHang);
+                statusData.push(item.soLuong);
+            });
+
+            const statusCtx = document.getElementById('orderStatusChart');
+            if (orderStatusChart) orderStatusChart.destroy();
+            
+            orderStatusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: statusLabels,
+                    datasets: [{
+                        data: statusData,
+                        backgroundColor: orderStatus.map(item => statusColors[item.TrangThaiDonHang] || '#9e9e9e')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTopProducts(data) {
+            const topProducts = data.topProducts || [];
+            const tbody = document.getElementById('topProductsTable');
+            
+            if (topProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">Chưa có dữ liệu</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = topProducts.map((product, index) => `
+                <tr>
+                    <td><strong>${index + 1}</strong></td>
+                    <td>${escapeHtml(product.TenSanPham)}</td>
+                    <td class="text-center"><span class="badge bg-primary">${product.soLuongBan}</span></td>
+                    <td class="text-end"><strong class="text-success">${formatCurrency(product.doanhThu)}</strong></td>
+                </tr>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
