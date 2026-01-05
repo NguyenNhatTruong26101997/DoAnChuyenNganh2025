@@ -133,21 +133,26 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // Check for remembered email and password on page load
-            const rememberedEmail = localStorage.getItem('rememberedEmail');
-            const rememberedPassword = localStorage.getItem('rememberedPassword');
+            // Check if user wants to be remembered
+            const isRemembered = localStorage.getItem('isRemembered') === 'true';
+            
+            if (isRemembered) {
+                // Only auto-fill if user previously checked "Remember me"
+                const rememberedEmail = localStorage.getItem('rememberedEmail');
+                const rememberedPassword = localStorage.getItem('rememberedPassword');
 
-            if (rememberedEmail) {
-                document.getElementById('email').value = rememberedEmail;
-                document.getElementById('remember').checked = true;
-            }
+                if (rememberedEmail) {
+                    document.getElementById('email').value = rememberedEmail;
+                    document.getElementById('remember').checked = true;
+                }
 
-            if (rememberedPassword) {
-                // Decode password (simple Base64)
-                try {
-                    document.getElementById('password').value = atob(rememberedPassword);
-                } catch (e) {
-                    console.error('Error decoding password');
+                if (rememberedPassword) {
+                    // Decode password (simple Base64)
+                    try {
+                        document.getElementById('password').value = atob(rememberedPassword);
+                    } catch (e) {
+                        console.error('Error decoding password');
+                    }
                 }
             }
 
@@ -195,10 +200,12 @@
 
                     // Handle Remember Me
                     if (remember) {
+                        localStorage.setItem('isRemembered', 'true');
                         localStorage.setItem('rememberedEmail', email);
                         // Encode password to Base64 before saving (Basic obfuscation)
                         localStorage.setItem('rememberedPassword', btoa(password));
                     } else {
+                        localStorage.removeItem('isRemembered');
                         localStorage.removeItem('rememberedEmail');
                         localStorage.removeItem('rememberedPassword');
                     }

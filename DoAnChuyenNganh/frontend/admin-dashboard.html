@@ -106,7 +106,7 @@
                     <div class="col-md-3">
                         <label class="form-label mb-2">Tháng</label>
                         <select class="form-select" id="monthFilter" onchange="loadDashboard()">
-                            <option value="">Tất cả</option>
+                            <option value="">Tất cả các tháng</option>
                             <option value="1">Tháng 1</option>
                             <option value="2">Tháng 2</option>
                             <option value="3">Tháng 3</option>
@@ -124,9 +124,12 @@
                     <div class="col-md-3">
                         <label class="form-label mb-2">Năm</label>
                         <select class="form-select" id="yearFilter" onchange="loadDashboard()">
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
+                            <option value="2030">2030</option>
+                            <option value="2029">2029</option>
+                            <option value="2028">2028</option>
+                            <option value="2027">2027</option>
+                            <option value="2026">2026</option>
+                            <option value="2025" selected>2025</option>
                         </select>
                     </div>
                     <div class="col-md-6 text-end">
@@ -242,8 +245,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkAdminAuth();
             
-            // Set current year
-            document.getElementById('yearFilter').value = new Date().getFullYear();
+            // Set default year to 2025
+            document.getElementById('yearFilter').value = '2025';
             
             // Load admin nav
             fetch('admin-nav.html')
@@ -302,6 +305,18 @@
 
         function updateStats(data) {
             const overview = data.overview || {};
+            
+            // Lấy tháng và năm hiện tại từ filter
+            const month = document.getElementById('monthFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            
+            // Cập nhật tiêu đề thống kê
+            let periodText = '';
+            if (month) {
+                periodText = ` (Tháng ${month}/${year})`;
+            } else {
+                periodText = ` (Năm ${year})`;
+            }
             
             // Doanh thu
             document.getElementById('totalRevenue').textContent = formatCurrency(overview.doanhThu || 0);

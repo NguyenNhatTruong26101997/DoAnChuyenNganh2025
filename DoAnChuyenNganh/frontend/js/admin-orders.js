@@ -170,6 +170,13 @@ function getActionButtons(order) {
         `;
     }
 
+    // Admin có thể xóa thật bất kỳ đơn hàng nào
+    buttons += `
+        <button class="btn btn-outline-dark" onclick="adminHardDeleteOrder(${order.IdDonHang})" title="Xóa vĩnh viễn">
+            <i class="fas fa-trash"></i>
+        </button>
+    `;
+
     return buttons;
 }
 
@@ -388,6 +395,42 @@ async function adminCancelOrder(orderId) {
         }
     } catch (error) {
         console.error('Admin cancel order error:', error);
+        showNotification('Lỗi kết nối đến server', 'error');
+    }
+}
+
+// Admin hard delete order - Xóa vĩnh viễn
+async function adminHardDeleteOrder(orderId) {
+    // Validate orderId - chống spam
+    if (!orderId || isNaN(orderId) || orderId <= 0 || orderId > 2147483647) {
+        showNotification('ID đơn hàng không hợp lệ', 'error');
+        return;
+    }
+
+    // Find order to show info
+    const order = currentOrders.find(o => o.IdDonHang === orderId);
+    const orderInfo = order ? `\nMã đơn: ${order.MaDonHang}\nKhách hàng: ${order.HoTen}` : '';
+
+    if (!confirm(`⚠️ CẢNH BÁO: Bạn đang thực hiện XÓA VĨNH VIỄN đơn hàng!\n\nHành động này KHÔNG THỂ HOÀN TÁC!${orderInfo}\n\nDữ liệu đơn hàng sẽ bị xóa hoàn toàn khỏi hệ thống.\n\nBạn có chắc chắn muốn tiếp tục?`)) {
+        return;
+    }
+
+    // Double confirm
+    if (!confirm('Xác nhận lần cuối: Bạn THỰC SỰ muốn xóa vĩnh viễn đơn hàng này?')) {
+        return;
+    }
+
+    try {
+        const response = await api.delete(`/orders/${orderId}/hard-delete`);
+
+        if (response.success) {
+            showNotification('Đã xóa vĩnh viễn đơn hàng', 'success');
+            loadAdminOrders(currentFilter);
+        } else {
+            showNotification(response.message || 'Không thể xóa đơn hàng', 'error');
+        }
+    } catch (error) {
+        console.error('Admin hard delete order error:', error);
         showNotification('Lỗi kết nối đến server', 'error');
     }
 }

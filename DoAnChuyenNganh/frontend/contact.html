@@ -162,6 +162,43 @@
     <script src="js/chatbot.js"></script>
 
     <script>
+        // Load user info if logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            
+            if (token && userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    
+                    // Fill user info
+                    const nameInput = document.getElementById('contactName');
+                    const emailInput = document.getElementById('contactEmail');
+                    const phoneInput = document.getElementById('contactPhone');
+                    
+                    if (user.HoTen || user.hoTen) {
+                        nameInput.value = user.HoTen || user.hoTen;
+                        nameInput.readOnly = true;
+                        nameInput.classList.add('bg-light');
+                    }
+                    
+                    if (user.Email || user.email) {
+                        emailInput.value = user.Email || user.email;
+                        emailInput.readOnly = true;
+                        emailInput.classList.add('bg-light');
+                    }
+                    
+                    if (user.SoDienThoai || user.soDienThoai) {
+                        phoneInput.value = user.SoDienThoai || user.soDienThoai;
+                        phoneInput.readOnly = true;
+                        phoneInput.classList.add('bg-light');
+                    }
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+        });
+
         // Count words in textarea
         function countWords(textarea) {
             const text = textarea.value.trim();

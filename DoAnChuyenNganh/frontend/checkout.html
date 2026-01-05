@@ -46,9 +46,18 @@
                                     </div>
                                 </div>
 
-                                <div class="mb-0">
+                                <div class="mb-3">
                                     <label class="form-label">Email</label>
                                     <input type="email" class="form-control" id="customerEmail" readonly>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label">Địa chỉ</label>
+                                    <textarea class="form-control" id="customerAddress" readonly rows="2"></textarea>
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle"></i> 
+                                        <span id="addressNote">Chưa có địa chỉ. Vui lòng cập nhật trong <a href="profile.html" target="_blank">Hồ sơ</a></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -101,33 +110,51 @@
                         <!-- Payment Method -->
                         <div class="card mb-4">
                             <div class="card-body">
-                                <h5 class="card-title mb-4"><i class="fas fa-money-bill-wave"></i> Phương thức thanh
-                                    toán</h5>
+                                <h5 class="card-title mb-4"><i class="fas fa-money-bill-wave"></i> Phương thức thanh toán</h5>
 
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="payment" id="cod" value="cod"
-                                        checked>
-                                    <label class="form-check-label" for="cod">
-                                        <strong>Thanh toán khi nhận hàng (COD)</strong>
-                                        <div class="text-muted small">Thanh toán bằng tiền mặt khi nhận hàng</div>
-                                    </label>
-                                </div>
-
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="payment" id="bank" value="bank">
-                                    <label class="form-check-label" for="bank">
-                                        <strong>Chuyển khoản ngân hàng</strong>
-                                        <div class="text-muted small">Chuyển khoản trực tiếp đến tài khoản ngân hàng
+                                <!-- COD -->
+                                <div class="form-check mb-3 p-3 border rounded" style="cursor: pointer;" onclick="document.getElementById('cod').click()">
+                                    <input class="form-check-input" type="radio" name="payment" id="cod" value="cod" checked onchange="updatePaymentMethod()">
+                                    <label class="form-check-label w-100" for="cod" style="cursor: pointer;">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-money-bill-wave fa-2x text-success me-3"></i>
+                                            <div>
+                                                <strong>Thanh toán khi nhận hàng (COD)</strong>
+                                                <div class="text-muted small">Thanh toán bằng tiền mặt khi nhận hàng</div>
+                                            </div>
                                         </div>
                                     </label>
                                 </div>
 
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="radio" name="payment" id="card" value="card">
-                                    <label class="form-check-label" for="card">
-                                        <strong>Thẻ tín dụng/Thẻ ghi nợ</strong>
-                                        <div class="text-muted small">Thanh toán bằng thẻ Visa, MasterCard, JCB</div>
+                                <!-- Bank Transfer -->
+                                <div class="form-check mb-3 p-3 border rounded" style="cursor: pointer;" onclick="document.getElementById('bank').click()">
+                                    <input class="form-check-input" type="radio" name="payment" id="bank" value="bank" onchange="updatePaymentMethod()">
+                                    <label class="form-check-label w-100" for="bank" style="cursor: pointer;">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-university fa-2x text-primary me-3"></i>
+                                            <div>
+                                                <strong>Chuyển khoản ngân hàng</strong>
+                                                <div class="text-muted small">Chuyển khoản trực tiếp đến tài khoản ngân hàng</div>
+                                            </div>
+                                        </div>
                                     </label>
+                                </div>
+
+                                <!-- Bank Transfer Details -->
+                                <div id="bankDetails" class="alert alert-info" style="display: none;">
+                                    <h6><i class="fas fa-info-circle"></i> Thông tin chuyển khoản:</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>Ngân hàng:</strong> Vietcombank</p>
+                                            <p class="mb-1"><strong>Số tài khoản:</strong> 0394127625</p>
+                                            <p class="mb-1"><strong>Chủ tài khoản:</strong> NGUYEN NHAT TRUONG</p>
+                                            <p class="mb-0"><strong>Nội dung:</strong> <span id="transferContent">Thanh toan LaptopWorld</span></p>
+                                        </div>
+                                        <div class="col-md-6 text-center">
+                                            <img id="qrCode" src="" alt="QR Code" class="img-fluid" style="max-width: 200px; display: none;">
+                                            <p class="text-muted small mt-2">Quét mã QR để chuyển khoản nhanh</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -200,8 +227,22 @@
                 return;
             }
 
-            // Load user data
-            userData = JSON.parse(localStorage.getItem('user'));
+            // Load user data from API to get latest info including address
+            try {
+                const userResponse = await api.get('/users/profile');
+                if (userResponse.success) {
+                    userData = userResponse.data;
+                    // Update localStorage with latest data
+                    localStorage.setItem('user', JSON.stringify(userData));
+                } else {
+                    // Fallback to localStorage
+                    userData = JSON.parse(localStorage.getItem('user'));
+                }
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                // Fallback to localStorage
+                userData = JSON.parse(localStorage.getItem('user'));
+            }
 
             // Load cart
             cartData = await getCartAPI();
@@ -220,9 +261,28 @@
 
         function prefillUserInfo() {
             if (userData) {
-                document.getElementById('customerName').value = userData.hoTen || userData.HoTen || '';
-                document.getElementById('customerPhone').value = userData.soDienThoai || userData.SoDienThoai || '';
-                document.getElementById('customerEmail').value = userData.email || userData.Email || '';
+                // Fill customer info
+                document.getElementById('customerName').value = userData.HoTen || '';
+                document.getElementById('customerPhone').value = userData.SoDienThoai || '';
+                document.getElementById('customerEmail').value = userData.Email || '';
+                
+                // Fill customer address
+                const customerAddress = document.getElementById('customerAddress');
+                const addressNote = document.getElementById('addressNote');
+                
+                if (userData.DiaChi) {
+                    customerAddress.value = userData.DiaChi;
+                    addressNote.innerHTML = '<i class="fas fa-check-circle text-success"></i> Địa chỉ từ hồ sơ của bạn';
+                    
+                    // Auto-fill shipping address if empty
+                    const shippingAddress = document.getElementById('address');
+                    if (!shippingAddress.value) {
+                        shippingAddress.value = userData.DiaChi;
+                    }
+                } else {
+                    customerAddress.value = '';
+                    addressNote.innerHTML = '<i class="fas fa-info-circle"></i> Chưa có địa chỉ. Vui lòng cập nhật trong <a href="profile.html" target="_blank">Hồ sơ</a>';
+                }
             }
         }
 
@@ -261,6 +321,36 @@
 
             document.getElementById('subtotal').textContent = formatCurrency(cartData.total);
             document.getElementById('total').textContent = formatCurrency(cartData.total);
+        }
+
+        function updatePaymentMethod() {
+            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            const bankDetails = document.getElementById('bankDetails');
+            
+            // Hide bank details by default
+            bankDetails.style.display = 'none';
+            
+            if (selectedPayment === 'bank') {
+                // Show bank transfer details with QR code
+                bankDetails.style.display = 'block';
+                generateQRCode();
+            }
+        }
+
+        function generateQRCode() {
+            // Generate QR code using VietQR API
+            const bankId = '970436'; // Vietcombank
+            const accountNo = '0394127625';
+            const accountName = 'NGUYEN NHAT TRUONG';
+            const amount = cartData ? cartData.total : 0;
+            const description = 'Thanh toan don hang';
+            
+            // VietQR API URL
+            const qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(description)}&accountName=${encodeURIComponent(accountName)}`;
+            
+            const qrCode = document.getElementById('qrCode');
+            qrCode.src = qrUrl;
+            qrCode.style.display = 'block';
         }
 
         async function handleCheckout(event) {
@@ -314,8 +404,7 @@
                     emailNguoiNhan: receiverEmail,
                     diaChiGiao: address,
                     ghiChu: note,
-                    phuongThucThanhToan: paymentMethod === 'cod' ? 'Tien mat' : 
-                                        paymentMethod === 'bank' ? 'Chuyen khoan' : 'The tin dung'
+                    phuongThucThanhToan: paymentMethod === 'cod' ? 'Tien mat' : 'Chuyen khoan'
                 });
 
                 if (result.success) {
@@ -326,9 +415,18 @@
                         await window.updateCartCount();
                     }
 
+                    // Show different messages based on payment method
+                    let message = `Cảm ơn bạn đã đặt hàng!\n\nMã đơn hàng: ${result.data.maDonHang}\n\n`;
+                    
+                    if (paymentMethod === 'cod') {
+                        message += 'Bạn sẽ thanh toán khi nhận hàng.\n\nChúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để xác nhận đơn hàng.';
+                    } else if (paymentMethod === 'bank') {
+                        message += 'Vui lòng chuyển khoản theo thông tin đã cung cấp.\n\nĐơn hàng sẽ được xử lý sau khi chúng tôi nhận được thanh toán.';
+                    }
+
                     setTimeout(() => {
-                        alert(`Cảm ơn bạn đã đặt hàng!\n\nMã đơn hàng: ${result.data.maDonHang}\n\nChúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất để xác nhận đơn hàng.`);
-                        window.location.href = 'profile.html';
+                        alert(message);
+                        window.location.href = 'orders.html';
                     }, 1000);
                 } else {
                     showNotification(result.message || 'Đặt hàng thất bại', 'error');

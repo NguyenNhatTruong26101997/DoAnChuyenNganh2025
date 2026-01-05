@@ -1,7 +1,15 @@
  // API Configuration
 const API_CONFIG = {
     BASE_URL: 'http://localhost:3000/api',
+    SERVER_URL: 'http://localhost:3000',
     TIMEOUT: 10000
+};
+
+// Helper function to get full image URL
+const getImageUrl = (path) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${API_CONFIG.SERVER_URL}${path}`;
 };
 
 // API Helper Functions

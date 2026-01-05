@@ -24,6 +24,7 @@ const contactRoutes = require('./routes/contact');
 const uploadRoutes = require('./routes/upload');
 const flashsaleRoutes = require('./routes/flashsale');
 const statisticsRoutes = require('./routes/statistics');
+const newsRoutes = require('./routes/news');
 
 // Initialize Express app
 const app = express();
@@ -75,6 +76,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/flashsale', flashsaleRoutes);
 app.use('/api/coupons', require('./routes/coupons'));
 app.use('/api/admin', statisticsRoutes);
+app.use('/api/news', newsRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

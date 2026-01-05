@@ -1,6 +1,8 @@
 // Profile Orders Management
 // Quản lý đơn hàng trong trang profile
 
+let allOrders = []; // Store all orders for filtering
+
 // Load user orders
 async function loadUserOrders() {
     try {
@@ -10,7 +12,9 @@ async function loadUserOrders() {
         const response = await api.get('/orders');
 
         if (response.success && response.data) {
-            if (response.data.length === 0) {
+            allOrders = response.data; // Store all orders
+            
+            if (allOrders.length === 0) {
                 ordersContainer.innerHTML = `
                     <div class="text-center py-5">
                         <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
@@ -22,7 +26,8 @@ async function loadUserOrders() {
                 return;
             }
 
-            ordersContainer.innerHTML = response.data.map(order => createOrderCard(order)).join('');
+            // Apply filters if any
+            applyFilters();
         } else {
             ordersContainer.innerHTML = `
                 <div class="alert alert-danger">
@@ -40,10 +45,86 @@ async function loadUserOrders() {
     }
 }
 
+// Apply filters
+function applyFilters() {
+    const statusFilter = document.getElementById('statusFilter')?.value || '';
+    const fromDate = document.getElementById('fromDateFilter')?.value || '';
+    const toDate = document.getElementById('toDateFilter')?.value || '';
+
+    let filteredOrders = [...allOrders];
+
+    // Filter by status
+    if (statusFilter) {
+        filteredOrders = filteredOrders.filter(order => order.TrangThai === statusFilter);
+    }
+
+    // Filter by date range
+    if (fromDate) {
+        const fromDateTime = new Date(fromDate).setHours(0, 0, 0, 0);
+        filteredOrders = filteredOrders.filter(order => {
+            const orderDate = new Date(order.ThoiDiemTao).setHours(0, 0, 0, 0);
+            return orderDate >= fromDateTime;
+        });
+    }
+
+    if (toDate) {
+        const toDateTime = new Date(toDate).setHours(23, 59, 59, 999);
+        filteredOrders = filteredOrders.filter(order => {
+            const orderDate = new Date(order.ThoiDiemTao).getTime();
+            return orderDate <= toDateTime;
+        });
+    }
+
+    // Display filtered orders
+    displayOrders(filteredOrders);
+
+    // Update result count
+    const resultCount = document.getElementById('filterResultCount');
+    if (resultCount) {
+        if (statusFilter || fromDate || toDate) {
+            resultCount.textContent = `Hiển thị ${filteredOrders.length}/${allOrders.length} đơn hàng`;
+        } else {
+            resultCount.textContent = '';
+        }
+    }
+}
+
+// Clear filters
+function clearFilters() {
+    const statusFilter = document.getElementById('statusFilter');
+    const fromDateFilter = document.getElementById('fromDateFilter');
+    const toDateFilter = document.getElementById('toDateFilter');
+    
+    if (statusFilter) statusFilter.value = '';
+    if (fromDateFilter) fromDateFilter.value = '';
+    if (toDateFilter) toDateFilter.value = '';
+    
+    applyFilters();
+}
+
+// Display orders
+function displayOrders(orders) {
+    const ordersContainer = document.getElementById('ordersContainer');
+    
+    if (orders.length === 0) {
+        ordersContainer.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h5>Không tìm thấy đơn hàng</h5>
+                <p class="text-muted">Thử thay đổi bộ lọc</p>
+            </div>
+        `;
+        return;
+    }
+
+    ordersContainer.innerHTML = orders.map(order => createOrderCard(order)).join('');
+}
+
 // Create order card HTML
 function createOrderCard(order) {
     const statusInfo = getOrderStatusInfo(order.TrangThai);
     const canCancel = canCancelOrder(order);
+    const canDelete = canDeleteOrder(order);
     const paymentMethodText = getPaymentMethodText(order.PhuongThucThanhToan);
 
     return `
@@ -79,6 +160,11 @@ function createOrderCard(order) {
                             ${canCancel ? `
                                 <button class="btn btn-outline-danger btn-sm" onclick="confirmCancelOrder(${order.IdDonHang}, '${escapeHtml(order.MaDonHang)}')">
                                     <i class="fas fa-times-circle"></i> Hủy đơn
+                                </button>
+                            ` : ''}
+                            ${canDelete ? `
+                                <button class="btn btn-outline-secondary btn-sm" onclick="confirmDeleteOrder(${order.IdDonHang}, '${escapeHtml(order.MaDonHang)}')">
+                                    <i class="fas fa-trash"></i> Xóa
                                 </button>
                             ` : ''}
                         </div>
@@ -140,6 +226,13 @@ function canCancelOrder(order) {
     const isCOD = (paymentMethod === 'Tien mat' || paymentMethod === 'COD');
     
     return isWaitingStatus && isCOD;
+}
+
+// Check if order can be deleted
+function canDeleteOrder(order) {
+    // Chỉ xóa được đơn đã hủy hoặc đã giao
+    const status = order.TrangThai;
+    return (status === 'Da huy' || status === 'Da giao');
 }
 
 // View order detail
@@ -284,6 +377,31 @@ async function cancelOrder(orderId) {
     }
 }
 
+// Confirm delete order
+function confirmDeleteOrder(orderId, orderCode) {
+    if (confirm(`Bạn có chắc muốn xóa đơn hàng ${orderCode}?\n\nLưu ý: Hành động này không thể hoàn tác.`)) {
+        deleteOrder(orderId);
+    }
+}
+
+// Delete order
+async function deleteOrder(orderId) {
+    try {
+        const response = await api.delete(`/orders/${orderId}`);
+
+        if (response.success) {
+            showNotification('Xóa đơn hàng thành công', 'success');
+            // Reload orders
+            loadUserOrders();
+        } else {
+            showNotification(response.message || 'Không thể xóa đơn hàng', 'error');
+        }
+    } catch (error) {
+        console.error('Delete order error:', error);
+        showNotification('Lỗi kết nối đến server', 'error');
+    }
+}
+
 // Format date time
 function formatDateTime(dateString) {
     if (!dateString) return '';
@@ -296,3 +414,6 @@ function formatDateTime(dateString) {
         minute: '2-digit'
     });
 }
+
+// Alias for orders.html compatibility
+const loadOrders = loadUserOrders;

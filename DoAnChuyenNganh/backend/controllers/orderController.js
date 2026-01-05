@@ -207,7 +207,7 @@ const getOrders = async (req, res) => {
     try {
         const userId = req.user.userId;
 
-        // Get orders with item count and payment method
+        // Get orders with item count and payment method (exclude deleted orders)
         const [orders] = await db.query(
             `SELECT 
                 dh.IdDonHang,
@@ -221,7 +221,7 @@ const getOrders = async (req, res) => {
             FROM DonHang dh
             LEFT JOIN ChiTietDonHang ct ON dh.IdDonHang = ct.DonHangId
             LEFT JOIN ThanhToan tt ON dh.IdDonHang = tt.DonHangId
-            WHERE dh.UserId = ?
+            WHERE dh.UserId = ? AND dh.DaXoa = 0
             GROUP BY dh.IdDonHang, dh.MaDonHang, dh.TrangThaiDonHang, dh.DiaChiGiao, 
                      dh.TongTien, dh.DonHangTao, tt.PhuongThucThanhToan
             ORDER BY dh.DonHangTao DESC`,
@@ -261,6 +261,7 @@ const getOrderById = async (req, res) => {
                 dh.GhiChu,
                 dh.TongTien,
                 dh.DonHangTao as ThoiDiemTao,
+                dh.DaXoa,
                 u.HoTen,
                 u.Email,
                 u.SoDienThoai
@@ -272,7 +273,7 @@ const getOrderById = async (req, res) => {
         const queryParams = [id];
 
         if (!isAdmin) {
-            query += ' AND dh.UserId = ?';
+            query += ' AND dh.UserId = ? AND dh.DaXoa = 0';
             queryParams.push(userId);
         }
 
@@ -551,11 +552,134 @@ const cancelOrder = async (req, res) => {
     }
 };
 
+// Delete order - Xóa mềm (soft delete) cho user
+const deleteOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.userId;
+        const isAdmin = req.user.vaiTro === 'admin' || req.user.vaiTro === 'Admin';
+
+        // Get order
+        let query = `
+            SELECT 
+                dh.UserId, 
+                dh.TrangThaiDonHang,
+                dh.MaDonHang,
+                dh.DaXoa
+            FROM DonHang dh
+            WHERE dh.IdDonHang = ?
+        `;
+        const queryParams = [id];
+
+        if (!isAdmin) {
+            query += ' AND dh.UserId = ?';
+            queryParams.push(userId);
+        }
+
+        const [orders] = await db.query(query, queryParams);
+
+        if (orders.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy đơn hàng'
+            });
+        }
+
+        const order = orders[0];
+
+        // Chỉ cho phép xóa đơn đã hủy hoặc đã giao
+        if (order.TrangThaiDonHang !== 'Da huy' && order.TrangThaiDonHang !== 'Da giao') {
+            return res.status(400).json({
+                success: false,
+                message: 'Chỉ có thể xóa đơn hàng đã hủy hoặc đã giao'
+            });
+        }
+
+        // Soft delete - chỉ đánh dấu DaXoa = 1
+        await db.query(
+            'UPDATE DonHang SET DaXoa = 1 WHERE IdDonHang = ?',
+            [id]
+        );
+
+        res.json({
+            success: true,
+            message: 'Xóa đơn hàng thành công'
+        });
+    } catch (error) {
+        console.error('Delete order error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server khi xóa đơn hàng'
+        });
+    }
+};
+
+// Hard delete order - Xóa thật sự (Admin only)
+const hardDeleteOrder = async (req, res) => {
+    const connection = await db.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        const { id } = req.params;
+
+        // Check if order exists
+        const [orders] = await connection.query(
+            'SELECT IdDonHang, MaDonHang FROM DonHang WHERE IdDonHang = ?',
+            [id]
+        );
+
+        if (orders.length === 0) {
+            await connection.rollback();
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy đơn hàng'
+            });
+        }
+
+        // Delete order details first (foreign key constraint)
+        await connection.query(
+            'DELETE FROM ChiTietDonHang WHERE DonHangId = ?',
+            [id]
+        );
+
+        // Delete payment records
+        await connection.query(
+            'DELETE FROM ThanhToan WHERE DonHangId = ?',
+            [id]
+        );
+
+        // Delete order
+        await connection.query(
+            'DELETE FROM DonHang WHERE IdDonHang = ?',
+            [id]
+        );
+
+        await connection.commit();
+
+        res.json({
+            success: true,
+            message: 'Đã xóa vĩnh viễn đơn hàng'
+        });
+    } catch (error) {
+        await connection.rollback();
+        console.error('Hard delete order error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi server khi xóa đơn hàng'
+        });
+    } finally {
+        connection.release();
+    }
+};
+
 module.exports = {
     createOrder,
     getOrders,
     getOrderById,
     updateOrderStatus,
     getAllOrders,
-    cancelOrder
+    cancelOrder,
+    deleteOrder,
+    hardDeleteOrder
 };

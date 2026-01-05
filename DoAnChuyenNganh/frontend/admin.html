@@ -221,6 +221,43 @@
                     </div>
                 </div>
 
+                <!-- News Tab -->
+                <div class="tab-pane fade" id="news" role="tabpanel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">Quản lý tin tức</h5>
+                                <button class="btn btn-primary" onclick="showAddNewsModal()">
+                                    <i class="fas fa-plus"></i> Thêm tin tức
+                                </button>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th width="60">ID</th>
+                                            <th width="80">Ảnh</th>
+                                            <th>Tiêu đề</th>
+                                            <th>Tác giả</th>
+                                            <th>Thông tin</th>
+                                            <th width="150">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="newsTableBody">
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5">
+                                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                                <p class="mt-2">Đang tải...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Users Tab -->
                 <div class="tab-pane fade" id="users" role="tabpanel">
                     <div class="card">
@@ -814,6 +851,50 @@
         </div>
     </div>
 
+    <!-- News Add/Edit Modal -->
+    <div class="modal fade" id="newsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newsModalTitle">Thêm tin tức mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="newsForm" onsubmit="submitNewsForm(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="newsId">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newsTieuDe" required 
+                                minlength="5" maxlength="255" placeholder="Nhập tiêu đề tin tức">
+                            <div class="form-text">5-255 ký tự</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Nội dung <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="newsNoiDung" rows="10" required 
+                                minlength="10" placeholder="Nhập nội dung tin tức"></textarea>
+                            <div class="form-text">Tối thiểu 10 ký tự</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ảnh bìa</label>
+                            <input type="file" class="form-control" id="newsAnhBia" accept="image/*">
+                            <div class="form-text">Chấp nhận: JPG, PNG, GIF, WEBP. Tối đa 5MB</div>
+                            <div id="currentImage" class="mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Flash Sale Product Modal -->
     <div class="modal fade" id="flashsaleProductModal" tabindex="-1">
         <div class="modal-dialog">
@@ -1004,6 +1085,7 @@
     <script src="js/admin-users.js"></script>
     <script src="js/admin-products.js"></script>
     <script src="js/admin-orders.js"></script>
+    <script src="js/admin-news.js"></script>
     <script src="js/admin-flashsale.js"></script>
     <script src="js/admin-reviews.js"></script>
     <script src="js/admin-contacts.js"></script>

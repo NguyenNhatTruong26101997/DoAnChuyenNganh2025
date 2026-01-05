@@ -29,6 +29,11 @@ function loadHeader() {
                 </a>
               </li>
               <li class="nav-item">
+                <a class="nav-link px-3" href="news.html" id="nav-news" style="white-space: nowrap;">
+                  <i class="fas fa-newspaper me-1"></i>Tin tức
+                </a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link px-3" href="#" id="nav-orders" onclick="handleOrdersClick(event)" style="white-space: nowrap;">
                   <i class="fas fa-box me-1"></i>Đơn hàng
                 </a>

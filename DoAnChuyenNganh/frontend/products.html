@@ -19,6 +19,32 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* Custom scrollbar for products container */
+        .col-lg-9 > div[style*="overflow-y"] {
+            scrollbar-width: thin;
+            scrollbar-color: #007bff #f0f0f0;
+        }
+        
+        .col-lg-9 > div[style*="overflow-y"]::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .col-lg-9 > div[style*="overflow-y"]::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        
+        .col-lg-9 > div[style*="overflow-y"]::-webkit-scrollbar-thumb {
+            background: #007bff;
+            border-radius: 10px;
+        }
+        
+        .col-lg-9 > div[style*="overflow-y"]::-webkit-scrollbar-thumb:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 
 <body>
@@ -108,16 +134,19 @@
                         </div>
                     </div>
 
-                    <!-- Products -->
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="productsGrid">
-                        <!-- Products will be loaded here -->
-                    </div>
+                    <!-- Products Container with Scrollbar -->
+                    <div style="max-height: calc(100vh - 200px); overflow-y: scroll; overflow-x: hidden; padding-right: 10px;">
+                        <!-- Products -->
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="productsGrid">
+                            <!-- Products will be loaded here -->
+                        </div>
 
-                    <!-- No Results -->
-                    <div id="noResults" class="text-center py-5" style="display: none;">
-                        <i class="fas fa-search fa-4x text-muted mb-3"></i>
-                        <h4>Không tìm thấy sản phẩm</h4>
-                        <p class="text-muted">Vui lòng thử lại với bộ lọc khác</p>
+                        <!-- No Results -->
+                        <div id="noResults" class="text-center py-5" style="display: none;">
+                            <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                            <h4>Không tìm thấy sản phẩm</h4>
+                            <p class="text-muted">Vui lòng thử lại với bộ lọc khác</p>
+                        </div>
                     </div>
                 </div>
             </div>
