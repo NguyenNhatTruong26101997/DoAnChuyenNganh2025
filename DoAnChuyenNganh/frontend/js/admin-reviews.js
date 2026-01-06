@@ -2,14 +2,34 @@
 let reviewsCurrentPage = 1;
 const reviewsPerPage = 20;
 
+// Make functions global
+window.loadAdminReviews = loadAdminReviews;
+window.searchReviews = searchReviews;
+window.showAdminReplyModal = showAdminReplyModal;
+window.submitAdminReply = submitAdminReply;
+window.deleteAdminReview = deleteAdminReview;
+
 // Initialize when reviews tab is shown
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
+    console.log('Admin reviews script loaded');
     const reviewsTab = document.getElementById('reviews-tab');
     if (reviewsTab) {
+        console.log('Reviews tab found');
+        reviewsTab.addEventListener('click', function() {
+            console.log('Reviews tab clicked');
+            setTimeout(() => {
+                loadAdminReviews();
+                loadProductsForFilter();
+            }, 300);
+        });
+        
         reviewsTab.addEventListener('shown.bs.tab', function() {
+            console.log('Reviews tab shown');
             loadAdminReviews();
             loadProductsForFilter();
         });
+    } else {
+        console.error('Reviews tab not found');
     }
 });
 

@@ -61,6 +61,17 @@ body {
   overflow-x: hidden;
   position: relative;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main content wrapper to push footer down */
+body > *:not(#footer-container) {
+  flex-shrink: 0;
+}
+
+#footer-container {
+  margin-top: auto;
 }
 
 body::before {
@@ -300,6 +311,7 @@ a:hover {
   color: #2c3e50;
   padding: var(--spacing-xl) 0 var(--spacing-sm);
   margin-top: var(--spacing-xl);
+  width: 100%;
 }
 
 .footer h5 {

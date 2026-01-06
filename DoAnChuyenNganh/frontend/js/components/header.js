@@ -222,13 +222,26 @@ function updateAdminMenu() {
   const token = localStorage.getItem('token');
   const contactMenuItem = document.getElementById('nav-contact')?.parentElement;
   const cartBtn = document.getElementById('cartBtn');
+  const newsMenuItem = document.getElementById('nav-news')?.parentElement;
+  const ordersMenuItem = document.getElementById('nav-orders')?.parentElement;
   
   console.log('updateAdminMenu - User:', user);
   console.log('updateAdminMenu - Token:', token ? 'exists' : 'null');
   console.log('updateAdminMenu - vaiTro:', user?.vaiTro);
 
+  // Check if user is logged in
+  const isLoggedIn = user && token;
+  
   // Check if user is admin
-  const isAdmin = user && token && (user.vaiTro === 'Admin' || user.vaiTro === 'admin');
+  const isAdmin = isLoggedIn && (user.vaiTro === 'Admin' || user.vaiTro === 'admin');
+
+  // Ẩn/hiện menu "Tin tức" và "Đơn hàng" - chỉ hiện khi đã đăng nhập
+  if (newsMenuItem) {
+    newsMenuItem.style.display = isLoggedIn ? 'block' : 'none';
+  }
+  if (ordersMenuItem) {
+    ordersMenuItem.style.display = isLoggedIn ? 'block' : 'none';
+  }
 
   if (isAdmin) {
     console.log('User is admin - hiding contact and cart');
@@ -250,9 +263,9 @@ function updateAdminMenu() {
       contactMenuItem.style.display = 'block';
     }
     
-    // Hiện nút "Giỏ hàng" cho user thường
+    // Hiện nút "Giỏ hàng" cho user thường (chỉ khi đã đăng nhập)
     if (cartBtn) {
-      cartBtn.style.display = 'block';
+      cartBtn.style.display = isLoggedIn ? 'block' : 'none';
     }
   }
 }

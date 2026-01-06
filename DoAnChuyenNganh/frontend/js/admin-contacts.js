@@ -315,14 +315,6 @@ function filterContacts() {
     loadContacts(1, status);
 }
 
-// Get image URL
-function getImageUrl(path) {
-    if (!path) return '';
-    if (path.startsWith('http')) return path;
-    if (path.startsWith('/uploads')) return 'http://localhost:3000' + path;
-    return 'http://localhost:3000/uploads/' + path;
-}
-
 // Update badge
 function updateContactBadge(count) {
     const badge = document.getElementById('contactBadge');
