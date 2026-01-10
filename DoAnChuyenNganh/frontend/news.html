@@ -320,7 +320,7 @@
 
                     <!-- Post Content -->
                     <div class="post-content">
-                        <div class="post-title">${escapeHtml(news.TieuDe)}</div>
+                        <div class="post-title">${news.DanhMuc || 'Tin tức'}</div>
                         <div class="post-text">${escapeHtml(news.NoiDung)}</div>
                     </div>
 
@@ -403,8 +403,31 @@
                 return;
             }
 
-            container.innerHTML = comments.map(comment => `
-                <div class="comment-item" id="comment-${comment.IdBinhLuan}">
+            // Tổ chức comments thành cây (parent-child)
+            const commentMap = {};
+            const rootComments = [];
+            
+            comments.forEach(comment => {
+                commentMap[comment.IdBinhLuan] = { ...comment, replies: [] };
+            });
+            
+            comments.forEach(comment => {
+                if (comment.ParentId && commentMap[comment.ParentId]) {
+                    commentMap[comment.ParentId].replies.push(commentMap[comment.IdBinhLuan]);
+                } else if (!comment.ParentId) {
+                    rootComments.push(commentMap[comment.IdBinhLuan]);
+                }
+            });
+
+            container.innerHTML = rootComments.map(comment => renderComment(comment, newsId)).join('');
+        }
+
+        function renderComment(comment, newsId, isReply = false) {
+            const marginClass = isReply ? 'ms-5' : '';
+            const canModify = comment.UserId === currentUser.IdUser || comment.UserId === currentUser.idUser;
+            
+            let html = `
+                <div class="comment-item ${marginClass}" id="comment-${comment.IdBinhLuan}">
                     <div class="comment-avatar">
                         ${comment.HoTen.charAt(0).toUpperCase()}
                     </div>
@@ -415,31 +438,74 @@
                         </div>
                         <div class="comment-time">
                             ${formatTimeAgo(comment.NgayTao)}
-                            ${comment.UserId === currentUser.IdUser || comment.UserId === currentUser.idUser ? `
-                                <span class="comment-actions">
+                            <span class="comment-actions">
+                                <button onclick="showReplyForm(${comment.IdBinhLuan}, ${newsId})">Trả lời</button>
+                                ${canModify ? `
                                     <button onclick="editComment(${comment.IdBinhLuan}, '${escapeHtml(comment.NoiDung).replace(/'/g, "\\'")}')">Sửa</button>
                                     <button onclick="deleteComment(${comment.IdBinhLuan}, ${newsId})">Xóa</button>
-                                </span>
-                            ` : ''}
+                                ` : ''}
+                            </span>
+                        </div>
+                        
+                        <!-- Reply form (ẩn mặc định) -->
+                        <div id="reply-form-${comment.IdBinhLuan}" style="display: none;" class="mt-2">
+                            <div class="comment-input-wrapper">
+                                <div class="comment-avatar">
+                                    ${currentUser.HoTen ? currentUser.HoTen.charAt(0).toUpperCase() : 'U'}
+                                </div>
+                                <input type="text" class="comment-input" placeholder="Viết trả lời..." 
+                                    id="reply-input-${comment.IdBinhLuan}" 
+                                    onkeypress="if(event.key==='Enter') addComment(${newsId}, ${comment.IdBinhLuan})">
+                                <button class="btn btn-primary btn-sm" onclick="addComment(${newsId}, ${comment.IdBinhLuan})">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            
+            // Render replies
+            if (comment.replies && comment.replies.length > 0) {
+                html += comment.replies.map(reply => renderComment(reply, newsId, true)).join('');
+            }
+            
+            return html;
         }
 
-        async function addComment(newsId) {
-            const input = document.getElementById(`comment-input-${newsId}`);
+        function showReplyForm(commentId, newsId) {
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            if (replyForm) {
+                replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+                if (replyForm.style.display === 'block') {
+                    document.getElementById(`reply-input-${commentId}`).focus();
+                }
+            }
+        }
+
+        async function addComment(newsId, parentId = null) {
+            const inputId = parentId ? `reply-input-${parentId}` : `comment-input-${newsId}`;
+            const input = document.getElementById(inputId);
             const noiDung = input.value.trim();
             
             if (!noiDung) return;
 
             try {
-                const response = await api.post(`/news/${newsId}/comments`, { noiDung });
+                const response = await api.post(`/news/${newsId}/comments`, { 
+                    noiDung,
+                    parentId 
+                });
                 
                 if (response.success) {
                     input.value = '';
                     await loadComments(newsId);
                     showNotification('Đã thêm bình luận', 'success');
+                    
+                    // Ẩn form reply nếu có
+                    if (parentId) {
+                        const replyForm = document.getElementById(`reply-form-${parentId}`);
+                        if (replyForm) replyForm.style.display = 'none';
+                    }
                 } else {
                     showNotification(response.message || 'Không thể thêm bình luận', 'error');
                 }

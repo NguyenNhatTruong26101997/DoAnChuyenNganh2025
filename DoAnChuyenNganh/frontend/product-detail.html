@@ -230,6 +230,28 @@
             await loadReviews();
             setupReviewForm();
             setupRatingInput();
+            
+            // Check if should auto-open review form
+            const shouldReview = getUrlParameter('review');
+            if (shouldReview === '1') {
+                // Scroll to review section and focus
+                setTimeout(() => {
+                    const reviewSection = document.getElementById('reviewsSection');
+                    if (reviewSection) {
+                        reviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        
+                        // Focus on review textarea after scroll
+                        setTimeout(() => {
+                            const reviewTextarea = document.getElementById('reviewContent');
+                            if (reviewTextarea) {
+                                reviewTextarea.focus();
+                                // Show a hint
+                                showNotification('Hãy chia sẻ trải nghiệm của bạn về sản phẩm này!', 'info');
+                            }
+                        }, 800);
+                    }
+                }, 500);
+            }
         });
 
         // Load product detail from API

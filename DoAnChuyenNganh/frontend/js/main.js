@@ -192,3 +192,19 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('Laptop World - Main JS Loaded');
+
+
+// ========================================
+// Admin Dashboard Reload Helper
+// ========================================
+
+// Reload dashboard statistics after any admin action
+function reloadAdminDashboard() {
+    // Check if we're on admin page and dashboard stats function exists
+    if (typeof window.reloadDashboardStats === 'function') {
+        window.reloadDashboardStats();
+    }
+}
+
+// Make it globally available
+window.reloadAdminDashboard = reloadAdminDashboard;

@@ -78,6 +78,14 @@ app.use('/api/coupons', require('./routes/coupons'));
 app.use('/api/admin', statisticsRoutes);
 app.use('/api/news', newsRoutes);
 
+// Notification routes
+const notificationController = require('./controllers/notificationController');
+const { verifyToken } = require('./middleware/auth');
+app.get('/api/notifications', verifyToken, notificationController.getUserNotifications);
+app.put('/api/notifications/read-all', verifyToken, notificationController.markAllAsRead);
+app.put('/api/notifications/:id/read', verifyToken, notificationController.markAsRead);
+app.delete('/api/notifications/:id', verifyToken, notificationController.deleteNotification);
+
 // Root endpoint
 app.get('/', (req, res) => {
     res.json({

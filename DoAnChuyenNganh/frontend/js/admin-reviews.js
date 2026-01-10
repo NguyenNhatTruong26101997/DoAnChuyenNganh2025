@@ -9,29 +9,38 @@ window.showAdminReplyModal = showAdminReplyModal;
 window.submitAdminReply = submitAdminReply;
 window.deleteAdminReview = deleteAdminReview;
 
-// Initialize when reviews tab is shown
-window.addEventListener('load', function() {
-    console.log('Admin reviews script loaded');
+// Initialize - wait for admin nav to load
+window.initReviewsTab = function() {
+    console.log('Initializing reviews tab...');
     const reviewsTab = document.getElementById('reviews-tab');
     if (reviewsTab) {
         console.log('Reviews tab found');
+        
+        // Load immediately if tab is already active
+        const reviewsPane = document.getElementById('reviews');
+        if (reviewsPane && reviewsPane.classList.contains('active')) {
+            console.log('Reviews tab is active, loading data...');
+            loadAdminReviews();
+            loadProductsForFilter();
+        }
+        
         reviewsTab.addEventListener('click', function() {
             console.log('Reviews tab clicked');
             setTimeout(() => {
                 loadAdminReviews();
                 loadProductsForFilter();
-            }, 300);
+            }, 100);
         });
         
         reviewsTab.addEventListener('shown.bs.tab', function() {
-            console.log('Reviews tab shown');
+            console.log('Reviews tab shown event');
             loadAdminReviews();
             loadProductsForFilter();
         });
     } else {
         console.error('Reviews tab not found');
     }
-});
+};
 
 // Load reviews for admin
 async function loadAdminReviews(page = 1) {
@@ -233,6 +242,11 @@ async function deleteAdminReview(reviewId) {
         if (result.success) {
             showNotification('Xóa bình luận thành công!', 'success');
             loadAdminReviews(reviewsCurrentPage);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Lỗi khi xóa', 'error');
         }

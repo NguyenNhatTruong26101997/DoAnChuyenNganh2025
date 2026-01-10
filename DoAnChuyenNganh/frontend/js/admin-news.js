@@ -108,7 +108,7 @@ function renderAdminNews(newsList) {
             <td>
                 ${news.AnhBia ? `<img src="${getImageUrl(news.AnhBia)}" style="width: 60px; height: 40px; object-fit: cover;" class="rounded">` : '<i class="fas fa-image text-muted"></i>'}
             </td>
-            <td><strong>${escapeHtml(news.TieuDe)}</strong></td>
+            <td><strong>${news.DanhMuc || 'Tin tức'}</strong></td>
             <td>${escapeHtml(news.TacGia)}</td>
             <td>
                 <small>${formatDateTime(news.NgayTao)}</small><br>
@@ -136,6 +136,7 @@ function showAddNewsModal() {
     document.getElementById('newsModalTitle').textContent = 'Thêm tin tức mới';
     document.getElementById('newsForm').reset();
     document.getElementById('newsId').value = '';
+    document.getElementById('newsDanhMuc').value = '';
     document.getElementById('currentImage').style.display = 'none';
     
     const modal = new bootstrap.Modal(document.getElementById('newsModal'));
@@ -151,12 +152,12 @@ async function showEditNewsModal(newsId) {
             
             document.getElementById('newsModalTitle').textContent = 'Sửa tin tức';
             document.getElementById('newsId').value = news.IdTinTuc;
-            document.getElementById('newsTieuDe').value = news.TieuDe;
+            document.getElementById('newsDanhMuc').value = news.DanhMuc || 'Hàng Mới';
             document.getElementById('newsNoiDung').value = news.NoiDung;
             
             const currentImage = document.getElementById('currentImage');
             if (news.AnhBia) {
-                currentImage.innerHTML = `<img src="${escapeHtml(news.AnhBia)}" class="img-thumbnail" style="max-width: 200px;">`;
+                currentImage.innerHTML = `<img src="${getImageUrl(news.AnhBia)}" class="img-thumbnail" style="max-width: 200px;">`;
                 currentImage.style.display = 'block';
             } else {
                 currentImage.style.display = 'none';
@@ -177,12 +178,12 @@ async function submitNewsForm(event) {
     event.preventDefault();
 
     const newsId = document.getElementById('newsId').value;
-    const tieuDe = document.getElementById('newsTieuDe').value.trim();
+    const danhMuc = document.getElementById('newsDanhMuc').value;
     const noiDung = document.getElementById('newsNoiDung').value.trim();
     const anhBiaFile = document.getElementById('newsAnhBia').files[0];
 
-    if (!tieuDe || tieuDe.length < 5 || tieuDe.length > 255) {
-        showNotification('Tiêu đề phải từ 5-255 ký tự', 'error');
+    if (!danhMuc) {
+        showNotification('Vui lòng chọn danh mục', 'error');
         return;
     }
 
@@ -192,7 +193,7 @@ async function submitNewsForm(event) {
     }
 
     const formData = new FormData();
-    formData.append('tieuDe', tieuDe);
+    formData.append('danhMuc', danhMuc);
     formData.append('noiDung', noiDung);
     if (anhBiaFile) {
         formData.append('anhBia', anhBiaFile);
@@ -242,6 +243,11 @@ async function submitNewsForm(event) {
             setTimeout(() => {
                 loadAdminNews();
             }, 500);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Có lỗi xảy ra', 'error');
         }
@@ -262,6 +268,11 @@ async function deleteNews(newsId) {
         if (response.success) {
             showNotification('Xóa tin tức thành công', 'success');
             loadAdminNews();
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(response.message || 'Không thể xóa tin tức', 'error');
         }

@@ -1,6 +1,12 @@
 const db = require('../config/database');
 const { generateOrderCode, sanitizeInput, isValidLength, isPositiveInteger, isValidOrderStatus } = require('../utils/helpers');
 const { sendOrderConfirmationEmail } = require('../utils/emailService');
+const { createAdminNotification } = require('../utils/notificationHelper');
+
+// Helper function
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+}
 
 // Create order from cart
 const createOrder = async (req, res) => {
@@ -170,6 +176,14 @@ const createOrder = async (req, res) => {
 
         await connection.commit();
 
+        // Create notification for admin
+        createAdminNotification(
+            'Đơn hàng mới',
+            `Đơn hàng ${maDonHang} - ${safeHoTenNguoiNhan} - ${formatCurrency(tongTien)}`,
+            'DonHang',
+            'admin.html#orders'
+        ).catch(err => console.error('Failed to create notification:', err));
+
         // Send order confirmation email (don't wait for it)
         if (safeEmailNguoiNhan) {
             sendOrderConfirmationEmail(safeEmailNguoiNhan, {
@@ -292,6 +306,7 @@ const getOrderById = async (req, res) => {
                 ct.IdChiTietDonHang,
                 ct.SoLuong,
                 ct.GiaBan,
+                sp.IdSanPham as SanPhamId,
                 sp.TenSanPham,
                 (SELECT Url FROM HinhAnhSanPham WHERE SanPhamId = sp.IdSanPham AND AnhMacDinh = 1 LIMIT 1) as AnhChinh
             FROM ChiTietDonHang ct
@@ -337,6 +352,21 @@ const updateOrderStatus = async (req, res) => {
             });
         }
 
+        // Get order info before update
+        const [orders] = await db.query(
+            'SELECT UserId, MaDonHang FROM DonHang WHERE IdDonHang = ?',
+            [id]
+        );
+
+        if (orders.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy đơn hàng'
+            });
+        }
+
+        const order = orders[0];
+
         const [result] = await db.query(
             'UPDATE DonHang SET TrangThaiDonHang = ? WHERE IdDonHang = ?',
             [trangThaiDonHang, id]
@@ -347,6 +377,25 @@ const updateOrderStatus = async (req, res) => {
                 success: false,
                 message: 'Không tìm thấy đơn hàng'
             });
+        }
+
+        // Create notification for user
+        const statusMessages = {
+            'Xac nhan': 'Đơn hàng của bạn đã được xác nhận',
+            'Dang giao': 'Đơn hàng của bạn đang được giao',
+            'Da giao': 'Đơn hàng của bạn đã giao thành công',
+            'Da huy': 'Đơn hàng của bạn đã bị hủy'
+        };
+
+        if (statusMessages[trangThaiDonHang]) {
+            const { createUserNotification } = require('../utils/notificationHelper');
+            createUserNotification(
+                order.UserId,
+                'Cập nhật đơn hàng',
+                `${statusMessages[trangThaiDonHang]} - ${order.MaDonHang}`,
+                'DonHang',
+                'orders.html'
+            ).catch(err => console.error('Failed to create user notification:', err));
         }
 
         res.json({
@@ -511,13 +560,10 @@ const cancelOrder = async (req, res) => {
 
         // Xác định trạng thái mới
         let newStatus = 'Da huy';
-        let paymentStatus = 'ThatBai';
+        let paymentStatus = 'That Bai'; // Có dấu cách, phải khớp với ENUM
         
-        // Nếu là admin hủy đơn online payment -> HoanTien
-        if (isAdmin && order.PhuongThucThanhToan !== 'Tien mat' && order.PhuongThucThanhToan !== 'COD') {
-            newStatus = 'HoanTien';
-            paymentStatus = 'HoanTien';
-        }
+        // Nếu là admin hủy đơn online payment -> cũng dùng 'That Bai' vì không có 'HoanTien' trong ENUM
+        // Admin có thể xử lý hoàn tiền thủ công
 
         // Update order status
         await connection.query(
@@ -535,7 +581,7 @@ const cancelOrder = async (req, res) => {
 
         res.json({
             success: true,
-            message: newStatus === 'HoanTien' ? 'Đã hủy đơn hàng và đánh dấu hoàn tiền' : 'Hủy đơn hàng thành công',
+            message: 'Hủy đơn hàng thành công',
             data: {
                 trangThaiMoi: newStatus
             }

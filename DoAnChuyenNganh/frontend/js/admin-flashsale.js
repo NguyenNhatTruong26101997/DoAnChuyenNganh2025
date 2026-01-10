@@ -1,5 +1,6 @@
 // Admin Flash Sale Management
 let allProductsForFlashSale = [];
+let allBrandsForFlashSale = [];
 let currentFlashSale = null;
 
 // Load flash sale info and products
@@ -117,33 +118,105 @@ async function showAddFlashSaleProductModal() {
 // Load products for dropdown
 async function loadProductsForSelect() {
     try {
-        const result = await api.get('/products?limit=100');
+        // Get all products
+        const result = await api.get('/products?limit=1000');
+        
+        console.log('Products loaded for select:', result);
         
         if (result.success) {
-            allProductsForFlashSale = result.data.products || [];
-            const select = document.getElementById('fsProductSelect');
-            select.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+            allProductsForFlashSale = result.data.products || result.data || [];
             
+            if (allProductsForFlashSale.length === 0) {
+                const select = document.getElementById('fsProductSelect');
+                select.innerHTML = '<option value="">Không có sản phẩm nào</option>';
+                console.warn('No products available');
+                return;
+            }
+            
+            // Extract unique brands
+            const brandsSet = new Set();
             allProductsForFlashSale.forEach(p => {
-                const option = document.createElement('option');
-                option.value = p.IdSanPham;
-                option.textContent = p.TenSanPham;
-                option.dataset.price = p.GiaSanPham;
-                select.appendChild(option);
+                if (p.TenThuongHieu) {
+                    brandsSet.add(p.TenThuongHieu);
+                }
             });
+            allBrandsForFlashSale = Array.from(brandsSet).sort();
             
-            // Update price when product selected
-            select.onchange = function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const price = selectedOption.dataset.price || 0;
-                document.getElementById('fsOriginalPrice').value = formatCurrency(price);
-                // Suggest sale price (10% off)
-                document.getElementById('fsSalePrice').value = Math.round(price * 0.9);
-            };
+            // Populate brand filter
+            const brandFilter = document.getElementById('fsBrandFilter');
+            if (brandFilter) {
+                brandFilter.innerHTML = '<option value="">-- Tất cả hãng --</option>';
+                allBrandsForFlashSale.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand;
+                    option.textContent = brand;
+                    brandFilter.appendChild(option);
+                });
+                console.log(`Loaded ${allBrandsForFlashSale.length} brands`);
+            }
+            
+            // Display all products initially
+            filterProductsByBrand();
+            
+        } else {
+            console.error('Failed to load products:', result.message);
         }
     } catch (error) {
         console.error('Load products error:', error);
     }
+}
+
+// Filter products by selected brand
+function filterProductsByBrand() {
+    const brandFilter = document.getElementById('fsBrandFilter');
+    const selectedBrand = brandFilter ? brandFilter.value : '';
+    
+    // Filter products
+    let filteredProducts = allProductsForFlashSale;
+    if (selectedBrand) {
+        filteredProducts = allProductsForFlashSale.filter(p => p.TenThuongHieu === selectedBrand);
+    }
+    
+    // Populate product select
+    const select = document.getElementById('fsProductSelect');
+    const currentValue = select.value; // Preserve selection if exists
+    
+    select.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+    
+    filteredProducts.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.IdSanPham;
+        option.textContent = `${p.TenSanPham} - ${formatCurrency(p.GiaSanPham)}`;
+        option.dataset.price = p.GiaSanPham;
+        option.dataset.brand = p.TenThuongHieu || '';
+        select.appendChild(option);
+    });
+    
+    // Restore selection if still available
+    if (currentValue) {
+        select.value = currentValue;
+    }
+    
+    // Update count
+    const countText = document.getElementById('fsProductCount');
+    if (countText) {
+        if (selectedBrand) {
+            countText.textContent = `Hiển thị ${filteredProducts.length} sản phẩm của ${selectedBrand}`;
+        } else {
+            countText.textContent = `Hiển thị tất cả ${filteredProducts.length} sản phẩm`;
+        }
+    }
+    
+    console.log(`Filtered to ${filteredProducts.length} products`);
+    
+    // Update price when product selected
+    select.onchange = function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const price = selectedOption.dataset.price || 0;
+        document.getElementById('fsOriginalPrice').value = formatCurrency(price);
+        // Suggest sale price (10% off)
+        document.getElementById('fsSalePrice').value = Math.round(price * 0.9);
+    };
 }
 
 // Edit flash sale product
@@ -253,6 +326,7 @@ async function saveFlashSaleProduct(event) {
             showNotification(id ? 'Cập nhật thành công' : 'Thêm thành công', 'success');
             bootstrap.Modal.getInstance(document.getElementById('flashsaleProductModal')).hide();
             loadFlashSaleData();
+            reloadAdminDashboard(); // Reload dashboard stats
         } else {
             showNotification(result.message || 'Lưu thất bại', 'error');
         }
@@ -272,6 +346,7 @@ async function deleteFlashSaleProduct(id) {
         if (result.success) {
             showNotification('Xóa thành công', 'success');
             loadFlashSaleProducts();
+            reloadAdminDashboard(); // Reload dashboard stats
         } else {
             showNotification(result.message || 'Xóa thất bại', 'error');
         }

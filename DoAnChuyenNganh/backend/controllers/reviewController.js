@@ -1,4 +1,5 @@
 const db = require('../config/database');
+const { createAdminNotification } = require('../utils/notificationHelper');
 
 // Get product reviews with replies
 const getProductReviews = async (req, res) => {
@@ -124,7 +125,7 @@ const createReview = async (req, res) => {
                  JOIN ChiTietDonHang ctdh ON dh.IdDonHang = ctdh.DonHangId
                  WHERE dh.UserId = ? 
                  AND ctdh.SanPhamId = ?
-                 AND dh.TrangThai IN ('Dang giao', 'Da giao')`,
+                 AND dh.TrangThaiDonHang IN ('Dang giao', 'Da giao')`,
                 [userId, sanPhamId]
             );
 
@@ -171,12 +172,24 @@ const createReview = async (req, res) => {
 
         // Get the created review with user info
         const [newReview] = await db.query(
-            `SELECT dg.*, u.HoTen, u.VaiTro 
+            `SELECT dg.*, u.HoTen, u.VaiTro, sp.TenSanPham
              FROM DanhGia dg 
              JOIN user u ON dg.UserId = u.IdUser 
+             JOIN SanPham sp ON dg.SanPhamId = sp.IdSanPham
              WHERE dg.IdDanhGia = ?`,
             [result.insertId]
         );
+
+        // Create notification for admin (only for root reviews, not replies)
+        if (!parentId) {
+            const stars = xepLoai ? `${xepLoai}⭐` : '';
+            createAdminNotification(
+                'Đánh giá mới',
+                `${newReview[0].HoTen} đánh giá ${stars} - ${newReview[0].TenSanPham}`,
+                'DanhGia',
+                'admin.html#reviews'
+            ).catch(err => console.error('Failed to create notification:', err));
+        }
 
         res.status(201).json({
             success: true,
@@ -375,9 +388,9 @@ const adminReplyReview = async (req, res) => {
             });
         }
 
-        // Get parent review to get sanPhamId
+        // Get parent review to get sanPhamId and userId
         const [parentReview] = await db.query(
-            'SELECT SanPhamId FROM DanhGia WHERE IdDanhGia = ?',
+            'SELECT SanPhamId, UserId, sp.TenSanPham FROM DanhGia dg JOIN SanPham sp ON dg.SanPhamId = sp.IdSanPham WHERE dg.IdDanhGia = ?',
             [id]
         );
 
@@ -388,11 +401,23 @@ const adminReplyReview = async (req, res) => {
             });
         }
 
+        const reviewOwner = parentReview[0];
+
         // Create admin reply
         const [result] = await db.query(
             'INSERT INTO DanhGia (UserId, SanPhamId, ParentId, BinhLuan) VALUES (?, ?, ?, ?)',
-            [userId, parentReview[0].SanPhamId, id, binhLuan.trim()]
+            [userId, reviewOwner.SanPhamId, id, binhLuan.trim()]
         );
+
+        // Notify the review owner
+        const { createUserNotification } = require('../utils/notificationHelper');
+        createUserNotification(
+            reviewOwner.UserId,
+            'Admin trả lời đánh giá',
+            `Admin đã trả lời đánh giá của bạn về "${reviewOwner.TenSanPham}"`,
+            'DanhGia',
+            `product-detail.html?id=${reviewOwner.SanPhamId}`
+        ).catch(err => console.error('Failed to create user notification:', err));
 
         res.status(201).json({
             success: true,

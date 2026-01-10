@@ -1,4 +1,5 @@
 const db = require('../config/database');
+const { createAdminNotification } = require('../utils/notificationHelper');
 
 // Create contact message
 const createContact = async (req, res) => {
@@ -36,6 +37,14 @@ const createContact = async (req, res) => {
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [userId, hoTen || null, email || null, soDienThoai || null, tieuDe, noiDung, hinhAnh || null]
         );
+
+        // Create notification for admin
+        createAdminNotification(
+            'Liên hệ mới',
+            `${hoTen || email} - ${tieuDe}`,
+            'LienHe',
+            'admin.html#contacts'
+        ).catch(err => console.error('Failed to create notification:', err));
 
         res.status(201).json({
             success: true,
@@ -188,6 +197,43 @@ const replyContact = async (req, res) => {
             });
         }
 
+        // Get contact info and admin name
+        const [contacts] = await db.query(
+            `SELECT 
+                lh.UserId,
+                lh.HoTen as HoTenLienHe,
+                lh.Email as EmailLienHe,
+                lh.TieuDe,
+                lh.NoiDung,
+                u.HoTen as HoTenUser,
+                u.Email as EmailUser,
+                admin.HoTen as AdminName
+            FROM LienHe lh
+            LEFT JOIN user u ON lh.UserId = u.IdUser
+            LEFT JOIN user admin ON admin.IdUser = ?
+            WHERE lh.IdLienHe = ?`,
+            [adminId, id]
+        );
+
+        if (contacts.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy liên hệ'
+            });
+        }
+
+        const contact = contacts[0];
+        const recipientEmail = contact.EmailLienHe || contact.EmailUser;
+        const recipientName = contact.HoTenLienHe || contact.HoTenUser;
+
+        if (!recipientEmail) {
+            return res.status(400).json({
+                success: false,
+                message: 'Không tìm thấy email người nhận'
+            });
+        }
+
+        // Update contact with reply
         const [result] = await db.query(
             `UPDATE LienHe 
              SET PhanHoi = ?, NgayPhanHoi = NOW(), AdminId = ?, TrangThai = 'Da tra loi'
@@ -202,9 +248,31 @@ const replyContact = async (req, res) => {
             });
         }
 
+        // Send email notification to user
+        const { sendContactReplyEmail } = require('../utils/emailService');
+        sendContactReplyEmail(recipientEmail, {
+            hoTen: recipientName,
+            tieuDe: contact.TieuDe,
+            noiDungGoc: contact.NoiDung,
+            phanHoi: phanHoi,
+            adminName: contact.AdminName
+        }).catch(err => console.error('Failed to send contact reply email:', err));
+
+        // Create notification for user if they have account
+        if (contact.UserId) {
+            const { createUserNotification } = require('../utils/notificationHelper');
+            createUserNotification(
+                contact.UserId,
+                'Phản hồi liên hệ',
+                `Admin đã trả lời liên hệ của bạn: "${contact.TieuDe}"`,
+                'LienHe',
+                'contact.html'
+            ).catch(err => console.error('Failed to create user notification:', err));
+        }
+
         res.json({
             success: true,
-            message: 'Phản hồi thành công'
+            message: 'Phản hồi thành công. Email đã được gửi đến người dùng.'
         });
     } catch (error) {
         console.error('Reply contact error:', error);

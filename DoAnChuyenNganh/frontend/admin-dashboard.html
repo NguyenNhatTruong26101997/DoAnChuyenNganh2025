@@ -128,8 +128,8 @@
                             <option value="2029">2029</option>
                             <option value="2028">2028</option>
                             <option value="2027">2027</option>
-                            <option value="2026">2026</option>
-                            <option value="2025" selected>2025</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
                         </select>
                     </div>
                     <div class="col-md-6 text-end">
@@ -185,6 +185,50 @@
                 </div>
             </div>
 
+            <!-- New Stats Row - Inventory, News, FlashSale, Contact -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon blue">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <div class="stats-label">Tổng số lượng trong kho</div>
+                        <div class="stats-value" id="inventoryTotal">0</div>
+                        <small class="text-muted"><span id="inventoryProducts">0</span> loại sản phẩm</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon green">
+                            <i class="fas fa-newspaper"></i>
+                        </div>
+                        <div class="stats-label">Tin tức</div>
+                        <div class="stats-value" id="newsTotal">0</div>
+                        <small class="text-muted"><span id="newsViews">0</span> lượt xem</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon orange">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="stats-label">Flash Sale</div>
+                        <div class="stats-value" id="flashsaleTotal">0</div>
+                        <small class="text-success"><span id="flashsaleActive">0</span> đang diễn ra</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-icon purple">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="stats-label">Liên hệ</div>
+                        <div class="stats-value" id="contactTotal">0</div>
+                        <small class="text-warning"><span id="contactPending">0</span> chưa xử lý</small>
+                    </div>
+                </div>
+            </div>
+
             <!-- Charts Row -->
             <div class="row">
                 <div class="col-md-8 mb-4">
@@ -203,7 +247,7 @@
 
             <!-- Top Products Table -->
             <div class="table-container">
-                <h6 class="chart-title">Top 10 sản phẩm bán chạy</h6>
+                <h6 class="chart-title">Top 10 sản phẩm bán chạy nhất (Từ trước tới nay)</h6>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
@@ -245,8 +289,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkAdminAuth();
             
-            // Set default year to 2025
-            document.getElementById('yearFilter').value = '2025';
+            // Set default year to current year (2026)
+            document.getElementById('yearFilter').value = '2026';
             
             // Load admin nav
             fetch('admin-nav.html')
@@ -303,8 +347,15 @@
             }
         }
 
+        // Make loadDashboard available globally
+        window.reloadDashboardStats = loadDashboard;
+
         function updateStats(data) {
             const overview = data.overview || {};
+            const inventory = data.inventory || {};
+            const news = data.news || {};
+            const flashsale = data.flashsale || {};
+            const contact = data.contact || {};
             
             // Lấy tháng và năm hiện tại từ filter
             const month = document.getElementById('monthFilter').value;
@@ -328,8 +379,24 @@
             // Khách hàng
             document.getElementById('totalCustomers').textContent = overview.soKhachHang || 0;
             
-            // Sản phẩm
+            // Sản phẩm đã bán
             document.getElementById('totalProducts').textContent = overview.sanPhamDaBan || 0;
+            
+            // Sản phẩm trong kho
+            document.getElementById('inventoryTotal').textContent = (inventory.tongSoLuongKho || 0).toLocaleString('vi-VN');
+            document.getElementById('inventoryProducts').textContent = inventory.tongSanPham || 0;
+            
+            // Tin tức
+            document.getElementById('newsTotal').textContent = news.tongTinTuc || 0;
+            document.getElementById('newsViews').textContent = (news.tongLuotXem || 0).toLocaleString('vi-VN');
+            
+            // Flash Sale
+            document.getElementById('flashsaleTotal').textContent = flashsale.tongFlashSale || 0;
+            document.getElementById('flashsaleActive').textContent = flashsale.flashSaleDangDienRa || 0;
+            
+            // Liên hệ
+            document.getElementById('contactTotal').textContent = contact.tongLienHe || 0;
+            document.getElementById('contactPending').textContent = contact.lienHeChuaXuLy || 0;
         }
 
         function updateCharts(data) {

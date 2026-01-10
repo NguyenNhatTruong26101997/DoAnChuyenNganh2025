@@ -238,7 +238,7 @@
                                         <tr>
                                             <th width="60">ID</th>
                                             <th width="80">Ảnh</th>
-                                            <th>Tiêu đề</th>
+                                            <th>Danh mục</th>
                                             <th>Tác giả</th>
                                             <th>Thông tin</th>
                                             <th width="150">Thao tác</th>
@@ -864,10 +864,13 @@
                         <input type="hidden" id="newsId">
                         
                         <div class="mb-3">
-                            <label class="form-label">Tiêu đề <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="newsTieuDe" required 
-                                minlength="5" maxlength="255" placeholder="Nhập tiêu đề tin tức">
-                            <div class="form-text">5-255 ký tự</div>
+                            <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                            <select class="form-select" id="newsDanhMuc" required>
+                                <option value="">-- Chọn danh mục --</option>
+                                <option value="Săn Sale">🔥 Săn Sale</option>
+                                <option value="Hàng Mới">✨ Hàng Mới</option>
+                                <option value="Giảm Giá">💰 Giảm Giá</option>
+                            </select>
                         </div>
 
                         <div class="mb-3">
@@ -906,11 +909,22 @@
                 <form id="fsProductForm" onsubmit="saveFlashSaleProduct(event)">
                     <div class="modal-body">
                         <input type="hidden" id="fsProductId">
+                        
+                        <!-- Brand Filter -->
+                        <div class="mb-3">
+                            <label class="form-label">Lọc theo hãng</label>
+                            <select class="form-select" id="fsBrandFilter" onchange="filterProductsByBrand()">
+                                <option value="">-- Tất cả hãng --</option>
+                            </select>
+                            <div class="form-text">Chọn hãng để lọc sản phẩm bên dưới</div>
+                        </div>
+                        
                         <div class="mb-3">
                             <label class="form-label">Chọn sản phẩm *</label>
                             <select class="form-select" id="fsProductSelect" required>
                                 <option value="">-- Chọn sản phẩm --</option>
                             </select>
+                            <div class="form-text" id="fsProductCount"></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Giá gốc</label>
@@ -1120,6 +1134,13 @@
                     const script = document.createElement('script');
                     script.src = 'js/admin-nav.js';
                     document.body.appendChild(script);
+                    
+                    // Initialize reviews tab after nav is loaded
+                    setTimeout(() => {
+                        if (window.initReviewsTab) {
+                            window.initReviewsTab();
+                        }
+                    }, 500);
                 })
                 .catch(err => console.error('Failed to load admin nav:', err));
         });

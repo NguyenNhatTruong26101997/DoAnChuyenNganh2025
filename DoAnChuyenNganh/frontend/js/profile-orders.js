@@ -241,6 +241,8 @@ async function viewOrderDetail(orderId) {
         const response = await api.get(`/orders/${orderId}`);
 
         if (response.success && response.data) {
+            console.log('Order detail response:', response.data);
+            console.log('Order items:', response.data.items);
             showOrderDetailModal(response.data);
         } else {
             showNotification(response.message || 'Không thể tải chi tiết đơn hàng', 'error');
@@ -307,7 +309,16 @@ function showOrderDetailModal(order) {
                                                         <img src="${item.AnhChinh}" alt="${item.TenSanPham}" 
                                                              style="width: 50px; height: 50px; object-fit: cover;" class="me-2">
                                                     ` : ''}
-                                                    <span>${item.TenSanPham}</span>
+                                                    <div>
+                                                        <div>${item.TenSanPham}</div>
+                                                        ${(order.TrangThai === 'Da giao' || order.TrangThai === 'DaGiao') ? `
+                                                            <a href="product-detail.html?id=${item.SanPhamId}&review=1" 
+                                                               class="btn btn-sm btn-outline-warning mt-1" 
+                                                               target="_blank">
+                                                                <i class="fas fa-star"></i> Đánh giá
+                                                            </a>
+                                                        ` : ''}
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td class="text-center">${item.SoLuong}</td>
@@ -362,7 +373,7 @@ function confirmCancelOrder(orderId, orderCode) {
 // Cancel order
 async function cancelOrder(orderId) {
     try {
-        const response = await api.delete(`/orders/${orderId}/cancel`);
+        const response = await api.put(`/orders/${orderId}/cancel`, {});
 
         if (response.success) {
             showNotification('Hủy đơn hàng thành công', 'success');

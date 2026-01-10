@@ -4,6 +4,61 @@ const db = require('../config/database');
 exports.getDashboardStatistics = async (req, res) => {
     try {
         const { year = new Date().getFullYear(), month } = req.query;
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
+
+        // Nếu chọn năm tương lai hoặc tháng tương lai -> trả về 0 hết
+        const isFutureYear = parseInt(year) > currentYear;
+        const isFutureMonth = parseInt(year) === currentYear && month && parseInt(month) > currentMonth;
+        
+        if (isFutureYear || isFutureMonth) {
+            return res.json({
+                success: true,
+                data: {
+                    overview: {
+                        doanhThu: 0,
+                        tongDon: 0,
+                        donThanhCong: 0,
+                        donHuy: 0,
+                        donChoXuLy: 0,
+                        soKhachHang: 0,
+                        sanPhamDaBan: 0,
+                        completionRate: 0,
+                        avgOrderValue: 0
+                    },
+                    inventory: {
+                        tongSanPham: 0,
+                        tongSoLuongKho: 0,
+                        sanPhamDangBan: 0,
+                        sanPhamNgungBan: 0,
+                        sanPhamHetHang: 0
+                    },
+                    news: {
+                        tongTinTuc: 0,
+                        tongLuotXem: 0,
+                        tinTucHienThi: 0,
+                        tongBinhLuan: 0
+                    },
+                    flashsale: {
+                        tongFlashSale: 0,
+                        flashSaleDangDienRa: 0,
+                        flashSaleSapDienRa: 0,
+                        flashSaleDaKetThuc: 0,
+                        soSanPhamFlashSale: 0
+                    },
+                    contact: {
+                        tongLienHe: 0,
+                        lienHeMoi: 0,
+                        lienHeDaDoc: 0,
+                        lienHeDaTraLoi: 0
+                    },
+                    monthlyRevenue: [],
+                    topProducts: [],
+                    brandRevenue: [],
+                    orderStatus: []
+                }
+            });
+        }
 
         // Build date filter - Use parameterized query to prevent SQL injection
         let dateFilter = 'YEAR(dh.DonHangTao) = ?';
@@ -48,6 +103,8 @@ exports.getDashboardStatistics = async (req, res) => {
             WHERE ${dateFilter}
             AND dh.TrangThaiDonHang = 'Da giao'
         `, params);
+        
+        console.log('📊 Thống kê sản phẩm đã bán:', productsResult[0].sanPhamDaBan);
 
         // 5. Doanh thu theo tháng (12 tháng)
         const [monthlyRevenue] = await db.query(`
@@ -61,7 +118,7 @@ exports.getDashboardStatistics = async (req, res) => {
             ORDER BY thang
         `, [year]);
 
-        // 6. Top sản phẩm bán chạy
+        // 6. Top sản phẩm bán chạy (từ trước tới nay - không filter theo tháng/năm)
         const [topProducts] = await db.query(`
             SELECT 
                 sp.TenSanPham,
@@ -71,12 +128,11 @@ exports.getDashboardStatistics = async (req, res) => {
             FROM ChiTietDonHang ct
             JOIN SanPham sp ON ct.SanPhamId = sp.IdSanPham
             JOIN DonHang dh ON ct.DonHangId = dh.IdDonHang
-            WHERE ${dateFilter}
-            AND dh.TrangThaiDonHang = 'Da giao'
+            WHERE dh.TrangThaiDonHang = 'Da giao'
             GROUP BY sp.IdSanPham
             ORDER BY soLuongBan DESC
             LIMIT 10
-        `, params);
+        `);
 
         // 7. Doanh thu theo thương hiệu
         const [brandRevenue] = await db.query(`
@@ -113,6 +169,57 @@ exports.getDashboardStatistics = async (req, res) => {
             ? (revenueResult[0].doanhThu / donThanhCong).toFixed(0) 
             : 0;
 
+        // 11. Thống kê sản phẩm trong kho (KHÔNG FILTER THEO THỜI GIAN)
+        const [inventoryStats] = await db.query(`
+            SELECT 
+                COUNT(*) as tongSanPham,
+                SUM(SoLuongSanPham) as tongSoLuongKho,
+                SUM(CASE WHEN TrangThaiSanPham = 'DangBan' THEN 1 ELSE 0 END) as sanPhamDangBan,
+                SUM(CASE WHEN TrangThaiSanPham = 'NgungBan' THEN 1 ELSE 0 END) as sanPhamNgungBan,
+                SUM(CASE WHEN SoLuongSanPham = 0 THEN 1 ELSE 0 END) as sanPhamHetHang
+            FROM SanPham
+        `);
+
+        // 12. Thống kê tin tức (filter theo ngày tạo)
+        const newsDateFilter = dateFilter.replace(/dh\.DonHangTao/g, 'tn.NgayTao');
+        const [newsStats] = await db.query(`
+            SELECT 
+                COUNT(*) as tongTinTuc,
+                SUM(LuotXem) as tongLuotXem,
+                SUM(CASE WHEN TrangThai = 'HienThi' THEN 1 ELSE 0 END) as tinTucHienThi,
+                (SELECT COUNT(*) FROM BinhLuanTinTuc bl 
+                 JOIN TinTuc t2 ON bl.TinTucId = t2.IdTinTuc 
+                 WHERE ${newsDateFilter.replace(/tn\./g, 't2.')}) as tongBinhLuan
+            FROM TinTuc tn
+            WHERE ${newsDateFilter}
+        `, [...params, ...params]);
+
+        // 13. Thống kê Flash Sale (KHÔNG FILTER THEO THỜI GIAN - hiển thị tất cả)
+        const [flashsaleStats] = await db.query(`
+            SELECT 
+                COUNT(*) as tongFlashSale,
+                SUM(CASE WHEN TrangThai = 'DangDien' THEN 1 ELSE 0 END) as flashSaleDangDienRa,
+                SUM(CASE WHEN TrangThai = 'SapDien' THEN 1 ELSE 0 END) as flashSaleSapDienRa,
+                SUM(CASE WHEN TrangThai = 'DaKetThuc' THEN 1 ELSE 0 END) as flashSaleDaKetThuc
+            FROM FlashSale
+        `);
+        
+        // Count flash sale products
+        const [flashsaleProductCount] = await db.query(`
+            SELECT COUNT(*) as soSanPhamFlashSale
+            FROM FlashSaleProducts
+        `);
+
+        // 14. Thống kê liên hệ (KHÔNG FILTER THEO THỜI GIAN - hiển thị tất cả)
+        const [contactStats] = await db.query(`
+            SELECT 
+                COUNT(*) as tongLienHe,
+                SUM(CASE WHEN TrangThai = 'Moi' THEN 1 ELSE 0 END) as lienHeMoi,
+                SUM(CASE WHEN TrangThai = 'Da Doc' THEN 1 ELSE 0 END) as lienHeDaDoc,
+                SUM(CASE WHEN TrangThai = 'Da tra loi' THEN 1 ELSE 0 END) as lienHeDaTraLoi
+            FROM LienHe
+        `);
+
         res.json({
             success: true,
             data: {
@@ -127,6 +234,13 @@ exports.getDashboardStatistics = async (req, res) => {
                     completionRate: parseFloat(completionRate),
                     avgOrderValue: parseInt(avgOrderValue)
                 },
+                inventory: inventoryStats[0],
+                news: newsStats[0],
+                flashsale: {
+                    ...flashsaleStats[0],
+                    soSanPhamFlashSale: flashsaleProductCount[0].soSanPhamFlashSale
+                },
+                contact: contactStats[0],
                 monthlyRevenue,
                 topProducts,
                 brandRevenue,

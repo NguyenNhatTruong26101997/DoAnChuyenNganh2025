@@ -363,6 +363,11 @@ async function submitUpdateOrderStatus(event) {
             
             // Reload orders
             loadAdminOrders(currentFilter);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(response.message || 'Không thể cập nhật trạng thái', 'error');
         }
@@ -390,6 +395,11 @@ async function adminCancelOrder(orderId) {
         if (response.success) {
             showNotification(response.message || 'Hủy đơn hàng thành công', 'success');
             loadAdminOrders(currentFilter);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(response.message || 'Không thể hủy đơn hàng', 'error');
         }
@@ -426,6 +436,11 @@ async function adminHardDeleteOrder(orderId) {
         if (response.success) {
             showNotification('Đã xóa vĩnh viễn đơn hàng', 'success');
             loadAdminOrders(currentFilter);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(response.message || 'Không thể xóa đơn hàng', 'error');
         }

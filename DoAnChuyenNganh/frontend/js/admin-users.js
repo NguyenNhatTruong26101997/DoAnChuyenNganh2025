@@ -265,6 +265,11 @@ async function saveUser(event) {
             showNotification(result.message || 'Lưu thành công', 'success');
             bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
             loadUsers(currentPage);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Lưu thất bại', 'error');
         }
@@ -306,6 +311,11 @@ async function deleteUser(userId) {
         if (result.success) {
             showNotification(result.message, 'success');
             loadUsers(currentPage);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Xóa người dùng thất bại', 'error');
         }

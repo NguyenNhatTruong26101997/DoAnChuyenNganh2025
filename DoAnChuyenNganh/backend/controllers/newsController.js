@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const { sanitizeInput, isValidLength } = require('../utils/helpers');
+const { createAdminNotification } = require('../utils/notificationHelper');
 const path = require('path');
 const fs = require('fs');
 
@@ -15,6 +16,7 @@ const getAllNews = async (req, res) => {
             SELECT 
                 tn.IdTinTuc,
                 tn.TieuDe,
+                tn.DanhMuc,
                 tn.NoiDung,
                 tn.AnhBia,
                 tn.NgayTao,
@@ -26,7 +28,7 @@ const getAllNews = async (req, res) => {
             JOIN user u ON tn.UserId = u.IdUser
             LEFT JOIN BinhLuanTinTuc bl ON tn.IdTinTuc = bl.TinTucId
             WHERE tn.TrangThai = 'HienThi'
-            GROUP BY tn.IdTinTuc, tn.TieuDe, tn.NoiDung, tn.AnhBia, tn.NgayTao, tn.LuotXem, u.HoTen, u.AnhDaiDien
+            GROUP BY tn.IdTinTuc, tn.TieuDe, tn.DanhMuc, tn.NoiDung, tn.AnhBia, tn.NgayTao, tn.LuotXem, u.HoTen, u.AnhDaiDien
             ORDER BY tn.NgayTao DESC
             LIMIT ? OFFSET ?
         `, [limitNum, offset]);
@@ -64,6 +66,7 @@ const getNewsById = async (req, res) => {
             SELECT 
                 tn.IdTinTuc,
                 tn.TieuDe,
+                tn.DanhMuc,
                 tn.NoiDung,
                 tn.AnhBia,
                 tn.NgayTao,
@@ -84,11 +87,16 @@ const getNewsById = async (req, res) => {
             });
         }
 
-        // Increment view count
-        await db.query(
-            'UPDATE TinTuc SET LuotXem = LuotXem + 1 WHERE IdTinTuc = ?',
-            [id]
-        );
+        // Increment view count (only for non-admin users)
+        const user = req.user;
+        const isAdmin = user && (user.vaiTro === 'Admin' || user.vaiTro === 'admin');
+        
+        if (!isAdmin) {
+            await db.query(
+                'UPDATE TinTuc SET LuotXem = LuotXem + 1 WHERE IdTinTuc = ?',
+                [id]
+            );
+        }
 
         res.json({
             success: true,
@@ -106,15 +114,15 @@ const getNewsById = async (req, res) => {
 // Create news (Admin only)
 const createNews = async (req, res) => {
     try {
-        const { tieuDe, noiDung } = req.body;
+        const { danhMuc, noiDung } = req.body;
         const userId = req.user.userId;
         const anhBia = req.file ? `/uploads/news/${req.file.filename}` : null;
 
         // Validation
-        if (!tieuDe || !isValidLength(tieuDe, 5, 255)) {
+        if (!danhMuc || !['Săn Sale', 'Hàng Mới', 'Giảm Giá'].includes(danhMuc)) {
             return res.status(400).json({
                 success: false,
-                message: 'Tiêu đề không hợp lệ (5-255 ký tự)'
+                message: 'Danh mục không hợp lệ'
             });
         }
 
@@ -125,12 +133,13 @@ const createNews = async (req, res) => {
             });
         }
 
-        const safeTieuDe = sanitizeInput(tieuDe);
+        // Auto-generate title from category
+        const tieuDe = danhMuc;
         const safeNoiDung = sanitizeInput(noiDung);
 
         const [result] = await db.query(
-            'INSERT INTO TinTuc (TieuDe, NoiDung, AnhBia, UserId) VALUES (?, ?, ?, ?)',
-            [safeTieuDe, safeNoiDung, anhBia, userId]
+            'INSERT INTO TinTuc (TieuDe, DanhMuc, NoiDung, AnhBia, UserId) VALUES (?, ?, ?, ?, ?)',
+            [tieuDe, danhMuc, safeNoiDung, anhBia, userId]
         );
 
         res.status(201).json({
@@ -153,7 +162,7 @@ const createNews = async (req, res) => {
 const updateNews = async (req, res) => {
     try {
         const { id } = req.params;
-        const { tieuDe, noiDung } = req.body;
+        const { danhMuc, noiDung } = req.body;
         const anhBia = req.file ? `/uploads/news/${req.file.filename}` : null;
 
         // Check if news exists
@@ -166,10 +175,10 @@ const updateNews = async (req, res) => {
         }
 
         // Validation
-        if (tieuDe && !isValidLength(tieuDe, 5, 255)) {
+        if (danhMuc && !['Săn Sale', 'Hàng Mới', 'Giảm Giá'].includes(danhMuc)) {
             return res.status(400).json({
                 success: false,
-                message: 'Tiêu đề không hợp lệ (5-255 ký tự)'
+                message: 'Danh mục không hợp lệ'
             });
         }
 
@@ -183,9 +192,9 @@ const updateNews = async (req, res) => {
         let updateQuery = 'UPDATE TinTuc SET ';
         const updateParams = [];
 
-        if (tieuDe) {
-            updateQuery += 'TieuDe = ?, ';
-            updateParams.push(sanitizeInput(tieuDe));
+        if (danhMuc) {
+            updateQuery += 'TieuDe = ?, DanhMuc = ?, ';
+            updateParams.push(danhMuc, danhMuc);
         }
 
         if (noiDung) {
@@ -275,12 +284,13 @@ const getComments = async (req, res) => {
                 bl.NgayTao,
                 bl.NgayCapNhat,
                 bl.UserId,
+                bl.ParentId,
                 u.HoTen,
                 u.AnhDaiDien
             FROM BinhLuanTinTuc bl
             JOIN user u ON bl.UserId = u.IdUser
             WHERE bl.TinTucId = ?
-            ORDER BY bl.NgayTao DESC
+            ORDER BY bl.NgayTao ASC
         `, [id]);
 
         res.json({
@@ -300,7 +310,7 @@ const getComments = async (req, res) => {
 const addComment = async (req, res) => {
     try {
         const { id } = req.params;
-        const { noiDung } = req.body;
+        const { noiDung, parentId } = req.body;
         const userId = req.user.userId;
 
         // Validation
@@ -314,23 +324,55 @@ const addComment = async (req, res) => {
         const safeNoiDung = sanitizeInput(noiDung);
 
         const [result] = await db.query(
-            'INSERT INTO BinhLuanTinTuc (TinTucId, UserId, NoiDung) VALUES (?, ?, ?)',
-            [id, userId, safeNoiDung]
+            'INSERT INTO BinhLuanTinTuc (TinTucId, UserId, NoiDung, ParentId) VALUES (?, ?, ?, ?)',
+            [id, userId, safeNoiDung, parentId || null]
         );
 
-        // Get the created comment with user info
+        // Get the created comment with user info and news title
         const [comment] = await db.query(`
             SELECT 
                 bl.IdBinhLuan,
                 bl.NoiDung,
                 bl.NgayTao,
                 bl.UserId,
+                bl.ParentId,
                 u.HoTen,
-                u.AnhDaiDien
+                u.VaiTro,
+                u.AnhDaiDien,
+                tn.TieuDe as TieuDeTinTuc,
+                tn.IdTinTuc
             FROM BinhLuanTinTuc bl
             JOIN user u ON bl.UserId = u.IdUser
+            JOIN TinTuc tn ON bl.TinTucId = tn.IdTinTuc
             WHERE bl.IdBinhLuan = ?
         `, [result.insertId]);
+
+        // Create notification for admin (only for root comments, not replies)
+        if (!parentId) {
+            createAdminNotification(
+                'Bình luận mới',
+                `${comment[0].HoTen} bình luận: "${comment[0].TieuDeTinTuc}"`,
+                'BinhLuan',
+                `news-detail.html?id=${id}`
+            ).catch(err => console.error('Failed to create notification:', err));
+        } else if (comment[0].VaiTro === 'admin') {
+            // If admin replies, notify the parent comment owner
+            const [parentComment] = await db.query(
+                'SELECT UserId FROM BinhLuanTinTuc WHERE IdBinhLuan = ?',
+                [parentId]
+            );
+            
+            if (parentComment.length > 0 && parentComment[0].UserId !== userId) {
+                const { createUserNotification } = require('../utils/notificationHelper');
+                createUserNotification(
+                    parentComment[0].UserId,
+                    'Admin trả lời bình luận',
+                    `Admin đã trả lời bình luận của bạn trong "${comment[0].TieuDeTinTuc}"`,
+                    'BinhLuan',
+                    `news-detail.html?id=${comment[0].IdTinTuc}`
+                ).catch(err => console.error('Failed to create user notification:', err));
+            }
+        }
 
         res.status(201).json({
             success: true,

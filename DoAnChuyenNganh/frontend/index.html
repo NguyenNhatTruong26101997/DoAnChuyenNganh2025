@@ -20,6 +20,7 @@
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/modern-effects.css">
 </head>
 
 <body>
@@ -133,7 +134,7 @@
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="text-gradient">Sản Phẩm Nổi Bật</h2>
-        <p class="text-muted">Các mẫu laptop được yêu thích nhất</p>
+        <h5 class="text-dark fw-bold">Các mẫu laptop được yêu thích nhất</h5>
       </div>
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="featuredProducts"></div>
@@ -156,7 +157,7 @@
     <div class="container">
       <div class="text-center mb-5">
         <h2 class="text-gradient">Khách Hàng Nói Gì</h2>
-        <p class="text-muted">Đánh giá từ khách hàng đã mua sắm tại Laptop World</p>
+        <h5 class="text-dark fw-bold">Đánh giá từ khách hàng đã mua sắm tại Laptop World</h5>
       </div>
 
       <div class="row g-4">
@@ -297,16 +298,6 @@
     // Placeholder image as data URI
     const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
 
-    // Get proper image URL
-    function getImageUrl(imagePath) {
-      if (!imagePath) return PLACEHOLDER_IMAGE;
-      if (imagePath.startsWith('data:')) return imagePath;
-      if (imagePath.startsWith('http')) return imagePath;
-      if (imagePath.startsWith('/uploads')) return 'http://localhost:3000' + imagePath;
-      if (imagePath.includes('product-')) return 'http://localhost:3000/uploads/products/' + imagePath;
-      return imagePath;
-    }
-
     // Create product card
     function createProductCard(product) {
       const col = document.createElement('div');
@@ -379,6 +370,9 @@
 
   <!-- Scroll to Top Button -->
   <script src="js/components/scroll-to-top.js"></script>
+  
+  <!-- Modern Animations -->
+  <script src="js/animations.js"></script>
 </body>
 
 </html>

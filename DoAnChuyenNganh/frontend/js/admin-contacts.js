@@ -300,6 +300,11 @@ async function deleteContact(id) {
             showNotification('Xóa liên hệ thành công', 'success');
             loadContacts(contactsCurrentPage);
             loadContactStats();
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Xóa thất bại', 'error');
         }

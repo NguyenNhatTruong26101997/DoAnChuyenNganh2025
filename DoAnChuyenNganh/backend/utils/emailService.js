@@ -376,6 +376,116 @@ const sendOrderConfirmationEmail = async (email, orderData) => {
     }
 };
 
+// Send contact reply email
+const sendContactReplyEmail = async (email, contactData) => {
+    try {
+        const { hoTen, tieuDe, noiDungGoc, phanHoi, adminName } = contactData;
+
+        const mailOptions = {
+            from: process.env.EMAIL_FROM,
+            to: email,
+            subject: `Phản hồi: ${tieuDe} - LaptopWorld`,
+            html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            padding: 20px;
+                        }
+                        .header {
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 30px;
+                            text-align: center;
+                            border-radius: 10px 10px 0 0;
+                        }
+                        .content {
+                            background: #f9f9f9;
+                            padding: 30px;
+                            border-radius: 0 0 10px 10px;
+                        }
+                        .message-box {
+                            background: white;
+                            padding: 20px;
+                            border-radius: 5px;
+                            margin: 20px 0;
+                            border-left: 4px solid #667eea;
+                        }
+                        .original-message {
+                            background: #f0f0f0;
+                            padding: 15px;
+                            border-radius: 5px;
+                            margin: 20px 0;
+                            font-size: 14px;
+                        }
+                        .reply-box {
+                            background: #e8f5e9;
+                            padding: 20px;
+                            border-radius: 5px;
+                            margin: 20px 0;
+                            border-left: 4px solid #4caf50;
+                        }
+                        .footer {
+                            text-align: center;
+                            margin-top: 20px;
+                            color: #666;
+                            font-size: 12px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>💬 Phản hồi từ LaptopWorld</h1>
+                        </div>
+                        <div class="content">
+                            <p>Xin chào <strong>${hoTen}</strong>,</p>
+                            
+                            <p>Cảm ơn bạn đã liên hệ với chúng tôi. Chúng tôi đã nhận được tin nhắn của bạn và xin gửi phản hồi như sau:</p>
+                            
+                            <div class="original-message">
+                                <h4>📝 Tin nhắn của bạn:</h4>
+                                <p><strong>Chủ đề:</strong> ${tieuDe}</p>
+                                <p style="white-space: pre-line;">${noiDungGoc}</p>
+                            </div>
+                            
+                            <div class="reply-box">
+                                <h4>✉️ Phản hồi từ ${adminName || 'Admin'}:</h4>
+                                <p style="white-space: pre-line;">${phanHoi}</p>
+                            </div>
+                            
+                            <p>Nếu bạn có thêm câu hỏi, vui lòng liên hệ lại với chúng tôi hoặc trả lời email này.</p>
+                            
+                            <p>Trân trọng,<br><strong>Đội ngũ LaptopWorld</strong></p>
+                        </div>
+                        <div class="footer">
+                            <p>Bạn nhận được email này vì đã gửi liên hệ đến LaptopWorld.</p>
+                            <p>&copy; 2024 LaptopWorld. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log('Contact reply email sent:', info.messageId);
+        return { success: true, messageId: info.messageId };
+    } catch (error) {
+        console.error('Send contact reply email error:', error);
+        return { success: false, error: error.message };
+    }
+};
+
 // Helper function to format currency
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {
@@ -387,5 +497,6 @@ function formatCurrency(amount) {
 module.exports = {
     sendPasswordResetEmail,
     sendWelcomeEmail,
-    sendOrderConfirmationEmail
+    sendOrderConfirmationEmail,
+    sendContactReplyEmail
 };

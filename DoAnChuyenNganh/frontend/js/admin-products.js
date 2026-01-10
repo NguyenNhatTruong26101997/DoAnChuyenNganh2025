@@ -409,6 +409,11 @@ async function saveProduct(event) {
             showNotification(result.message || 'Lưu thành công', 'success');
             bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
             loadProducts(productsCurrentPage);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Lưu thất bại', 'error');
         }
@@ -431,6 +436,11 @@ async function deleteProduct(id) {
         if (result.success) {
             showNotification(result.message || 'Xóa thành công', 'success');
             loadProducts(productsCurrentPage);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Xóa thất bại', 'error');
         }
@@ -451,6 +461,11 @@ async function toggleProductStatus(id, currentStatus) {
         if (result.success) {
             showNotification(result.message || 'Cập nhật trạng thái thành công', 'success');
             loadProducts(productsCurrentPage);
+            
+            // Reload dashboard if function exists
+            if (typeof reloadAdminDashboard === 'function') {
+                reloadAdminDashboard();
+            }
         } else {
             showNotification(result.message || 'Cập nhật trạng thái thất bại', 'error');
         }

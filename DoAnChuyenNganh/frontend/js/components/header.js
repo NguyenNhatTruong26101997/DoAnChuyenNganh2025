@@ -59,6 +59,27 @@ function loadHeader() {
                 <span class="cart-badge" id="cartCount">0</span>
               </a>
               
+              <!-- Notification Icon (for logged in users) -->
+              <div class="dropdown me-2" id="notificationDropdown" style="display: none;">
+                <button class="btn btn-link position-relative" type="button" id="notificationBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-bell fs-5"></i>
+                  <span class="cart-badge" id="notificationCount" style="display: none;">0</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationBtn" style="width: 350px; max-height: 500px; overflow-y: auto;">
+                  <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                    <h6 class="mb-0">Thông báo</h6>
+                    <button class="btn btn-sm btn-link text-decoration-none" onclick="markAllNotificationsAsRead()">
+                      Đánh dấu đã đọc
+                    </button>
+                  </div>
+                  <div id="notificationList">
+                    <div class="text-center py-3">
+                      <i class="fas fa-spinner fa-spin"></i> Đang tải...
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <!-- User Dropdown -->
               <div class="dropdown" id="userDropdown">
                 <button class="btn btn-link dropdown-toggle text-decoration-none" type="button" id="userDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
@@ -240,7 +261,8 @@ function updateAdminMenu() {
     newsMenuItem.style.display = isLoggedIn ? 'block' : 'none';
   }
   if (ordersMenuItem) {
-    ordersMenuItem.style.display = isLoggedIn ? 'block' : 'none';
+    // Admin không hiện menu đơn hàng, chỉ user thường
+    ordersMenuItem.style.display = (isLoggedIn && !isAdmin) ? 'block' : 'none';
   }
 
   if (isAdmin) {
@@ -314,6 +336,198 @@ function logout(event) {
     window.location.href = 'index.html';
   }
 }
+
+// ============ NOTIFICATION FUNCTIONS ============
+
+// Load notifications
+async function loadNotifications() {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  try {
+    const response = await api.get('/notifications?limit=10');
+    
+    if (response.success) {
+      displayNotifications(response.data);
+      updateNotificationCount(response.unreadCount);
+    }
+  } catch (error) {
+    console.error('Load notifications error:', error);
+  }
+}
+
+// Display notifications in dropdown
+function displayNotifications(notifications) {
+  const notificationList = document.getElementById('notificationList');
+  if (!notificationList) return;
+
+  if (notifications.length === 0) {
+    notificationList.innerHTML = `
+      <div class="text-center py-4 text-muted">
+        <i class="fas fa-inbox fa-2x mb-2"></i>
+        <p class="mb-0">Không có thông báo</p>
+      </div>
+    `;
+    return;
+  }
+
+  notificationList.innerHTML = notifications.map(notif => `
+    <div class="notification-item ${notif.DaDoc ? '' : 'unread'}" data-id="${notif.IdThongBao}">
+      <div class="d-flex align-items-start p-3 border-bottom" style="cursor: pointer;" onclick="handleNotificationClick(${notif.IdThongBao}, '${notif.LienKet || ''}')">
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <strong class="notification-title">${escapeHtml(notif.TieuDe)}</strong>
+            ${!notif.DaDoc ? '<span class="badge bg-primary badge-sm">Mới</span>' : ''}
+          </div>
+          <p class="notification-content mb-1">${escapeHtml(notif.NoiDung)}</p>
+          <small class="text-muted">
+            <i class="fas fa-clock"></i> ${formatTimeAgo(notif.NgayTao)}
+          </small>
+        </div>
+        <button class="btn btn-sm btn-link text-danger" onclick="deleteNotification(event, ${notif.IdThongBao})" title="Xóa">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Update notification count badge
+function updateNotificationCount(count) {
+  const notificationCount = document.getElementById('notificationCount');
+  const notificationDropdown = document.getElementById('notificationDropdown');
+  
+  if (notificationCount && notificationDropdown) {
+    const token = localStorage.getItem('token');
+    
+    if (token) {
+      // Luôn hiển thị chuông khi đã đăng nhập
+      notificationDropdown.style.display = 'block';
+      
+      // Chỉ hiển thị badge số khi có thông báo
+      if (count > 0) {
+        notificationCount.textContent = count > 99 ? '99+' : count;
+        notificationCount.style.display = 'inline-block';
+      } else {
+        notificationCount.style.display = 'none';
+      }
+    } else {
+      notificationDropdown.style.display = 'none';
+    }
+  }
+}
+
+// Handle notification click
+async function handleNotificationClick(notificationId, link) {
+  try {
+    // Mark as read
+    await api.put(`/notifications/${notificationId}/read`);
+    
+    // Reload notifications
+    await loadNotifications();
+    
+    // Navigate to link if exists
+    if (link) {
+      // Check if link contains hash (e.g., admin.html#reviews)
+      if (link.includes('#')) {
+        const [page, hash] = link.split('#');
+        const currentPage = window.location.pathname.split('/').pop();
+        
+        // If already on the same page, just activate the tab
+        if (currentPage === page || (currentPage === 'admin.html' && page === 'admin.html')) {
+          // Activate the tab
+          const tabId = hash + '-tab';
+          const tabElement = document.getElementById(tabId);
+          if (tabElement) {
+            const tab = new bootstrap.Tab(tabElement);
+            tab.show();
+          }
+        } else {
+          // Navigate to the page with hash
+          window.location.href = link;
+        }
+      } else {
+        // Regular link, just navigate
+        window.location.href = link;
+      }
+    }
+  } catch (error) {
+    console.error('Handle notification click error:', error);
+  }
+}
+
+// Mark all notifications as read
+async function markAllNotificationsAsRead() {
+  try {
+    const response = await api.put('/notifications/read-all');
+    
+    if (response.success) {
+      await loadNotifications();
+      showNotification('Đã đánh dấu tất cả đã đọc', 'success');
+    }
+  } catch (error) {
+    console.error('Mark all as read error:', error);
+    showNotification('Có lỗi xảy ra', 'error');
+  }
+}
+
+// Delete notification
+async function deleteNotification(event, notificationId) {
+  event.stopPropagation();
+  
+  if (!confirm('Bạn có chắc muốn xóa thông báo này?')) return;
+  
+  try {
+    const response = await api.delete(`/notifications/${notificationId}`);
+    
+    if (response.success) {
+      await loadNotifications();
+      showNotification('Đã xóa thông báo', 'success');
+    }
+  } catch (error) {
+    console.error('Delete notification error:', error);
+    showNotification('Có lỗi xảy ra', 'error');
+  }
+}
+
+// Format time ago
+function formatTimeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) return 'Vừa xong';
+  if (seconds < 3600) return Math.floor(seconds / 60) + ' phút trước';
+  if (seconds < 86400) return Math.floor(seconds / 3600) + ' giờ trước';
+  if (seconds < 604800) return Math.floor(seconds / 86400) + ' ngày trước';
+  
+  return date.toLocaleDateString('vi-VN');
+}
+
+// Make functions globally available
+window.loadNotifications = loadNotifications;
+window.handleNotificationClick = handleNotificationClick;
+window.markAllNotificationsAsRead = markAllNotificationsAsRead;
+window.deleteNotification = deleteNotification;
+
+// Load notifications when dropdown is opened
+document.addEventListener('DOMContentLoaded', function() {
+  const notificationBtn = document.getElementById('notificationBtn');
+  if (notificationBtn) {
+    notificationBtn.addEventListener('click', function() {
+      loadNotifications();
+    });
+  }
+  
+  // Load initial notification count
+  const token = localStorage.getItem('token');
+  if (token) {
+    loadNotifications();
+    
+    // Refresh notifications every 30 seconds
+    setInterval(loadNotifications, 30000);
+  }
+});
 
 // Load header when DOM is ready
 if (document.readyState === 'loading') {
